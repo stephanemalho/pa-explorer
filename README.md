@@ -40,6 +40,27 @@ uvicorn app.main:app --reload
 L'API est disponible sur `http://localhost:8000`.  
 La documentation interactive Swagger est accessible sur `http://localhost:8000/docs`.
 
+## Procédures de développement
+
+### Premier démarrage
+1. Activer le venv : `.\venv\Scripts\activate` (PowerShell)
+2. Installer les dépendances : `pip install -r requirements.txt`
+3. Copier `.env.example` vers `.env.local` et renseigner les valeurs
+4. Lancer le serveur : `python -m uvicorn app.main:app --reload`
+5. Ouvrir Swagger : http://localhost:8000/docs
+
+### Réinitialiser la base après modification d'un modèle
+1. Arrêter uvicorn avec Ctrl+C
+2. Fermer l'onglet pa_explorer.db dans VS Code (s'il est ouvert)
+3. Supprimer la base : `del pa_explorer.db`
+4. Relancer le serveur : `python -m uvicorn app.main:app --reload`
+
+### En cas de fichier verrouillé
+Si la suppression échoue avec un message "fichier en cours d'utilisation" :
+1. Lister les processus Python : `Get-Process | Where-Object {$_.ProcessName -like "*python*"}`
+2. Tuer les instances : `Get-Process python3.12 | Stop-Process -Force`
+3. Réessayer la suppression
+
 ## Variables d'environnement
 
 | Variable | Description | Exemple |

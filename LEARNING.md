@@ -123,3 +123,14 @@ C'est ici que je veux te ralentir une seconde, parce que la suppression de la ba
 Quand tu ajoutes des colonnes à un modèle SQLAlchemy, il y a deux façons de propager ces nouvelles colonnes à la base existante. La première est une migration, c'est-à-dire un script qui modifie la structure de la base sans perdre les données existantes. C'est ce qu'on fait en production avec des outils comme Alembic. La seconde est de supprimer la base et de la laisser se recréer entièrement, ce qui efface tout l'historique mais garantit un schéma cohérent. C'est acceptable en développement quand les données sont volatiles et facilement reproductibles.
 Tu es exactement dans ce cas. Tes données sont rechargeables depuis IBM PA en quelques secondes, donc supprimer la base et la laisser se recréer est la bonne stratégie pour un environnement de dev. En production, ce serait inacceptable, mais nous sommes loin de la production.
 Note dans ton LEARNING.md ce concept de migration que tu vas rencontrer beaucoup plus formellement en semaine cinq ou six quand on parlera de la robustesse du projet. Pour l'instant, supprimer et recréer est notre stratégie acceptable.
+
+## mise a jour de la base sans SQLIte sans migrations Alembic
+Oui, tant que tu es en développement avec SQLite et que tu n'as pas mis en place de migrations Alembic, tu vas devoir répéter cette procédure à chaque fois que tu modifies la structure d'un modèle SQLAlchemy. Concrètement, c'est-à-dire à chaque fois que tu ajoutes ou supprimes une colonne, que tu changes un type, ou que tu modifies une contrainte. La fréquence dépend de ta vitesse de développement, mais sur les semaines à venir je m'attends à ce que tu fasses cela peut-être deux à cinq fois par semaine.
+
+Le fichier est verrouillé par le serveur en cours. 
+
+Arrête uvicorn (Ctrl+C), puis supprime la base :
+```bash
+del pa_explorer.db
+python -m uvicorn app.main:app --reload
+```
