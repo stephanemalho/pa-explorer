@@ -134,3 +134,56 @@ Arrête uvicorn (Ctrl+C), puis supprime la base :
 del pa_explorer.db
 python -m uvicorn app.main:app --reload
 ```
+
+## Session du 28 avril 2026 — Semaine 2 finalisée
+
+### Ce qui a été accompli
+Implémentation complète de la feature de listing des serveurs TM1 depuis 
+l'API IBM Planning Analytics. Le projet expose maintenant deux endpoints 
+fonctionnels, GET /api/v1/servers et POST /api/v1/servers/refresh, avec 
+une stratégie de cache TTL configurable et une gestion d'erreurs structurée 
+en sept types d'exceptions métier.
+
+### Concepts techniques découverts
+L'authentification IBM PA SaaS utilise un Basic Auth particulier avec la 
+chaîne littérale "apikey" en username et la clé API en password, ce qui 
+explique pourquoi mes premières tentatives Postman avec mon email avaient 
+échoué.
+
+SQLite ne supporte pas nativement les timezones, ce qui crée des datetimes 
+naive en lecture qu'il faut normaliser avant comparaison avec des datetimes 
+aware. Cela m'a coûté un long débogage qui aurait été immédiat avec des 
+tests automatisés. C'est mon premier argument concret pour me motiver sur 
+la semaine 5 dédiée aux feedback loops.
+
+Le format Parquet sera utilisé en semaine future pour stocker les données 
+de cellules volumineuses, en complément de SQLite qui reste pour les 
+métadonnées structurées.
+
+### Méthodologie de débogage
+Quand un endpoint plante, ne pas se précipiter sur la correction. Comparer 
+d'abord le cas qui marche et le cas qui plante pour cerner la zone exacte 
+du bug. C'est cette discipline qui m'a permis d'isoler le problème de 
+timezone, parce que force_refresh true marchait alors que false plantait.
+
+Les bugs invisibles existent. J'ai eu un mapping incomplet qui retournait 
+des null silencieusement sans aucune erreur. Sans observation manuelle 
+attentive, ce bug serait passé en production. Les tests automatisés sont 
+le seul rempart fiable contre ce type de problème.
+
+### Collaboration avec Claude Code
+J'ai expérimenté trois modes de travail dans la même session. Le mode Plan 
+pour la conception initiale, qui a produit un plan détaillé que j'ai validé 
+avec des ajustements précis. Le mode direct pour les corrections de bug 
+bien circonscrites. Le dialogue rapide pour les ajustements mineurs.
+
+Le mode Plan vaut largement les minutes investies en début de feature, 
+parce qu'il évite les erreurs structurelles qui coûtent ensuite des heures 
+à rattraper. Le mode direct convient aux corrections quand on a déjà un 
+diagnostic clair.
+
+### État du projet à la fin de la semaine 2
+Le backend expose une API REST fonctionnelle qui consomme IBM PA, gère 
+un cache local en SQLite, et est prêt à accueillir les futures entités 
+cubes, dimensions et processus. L'architecture en couches client/service/
+router est en place et facilitera l'ajout des prochaines features.
