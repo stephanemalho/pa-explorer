@@ -17,7 +17,7 @@ cd pa-explorer
 # 2. Créer et activer un environnement virtuel
 python -m venv .venv
 source .venv/bin/activate        # Linux/macOS
-.venv\Scripts\activate           # Windows
+.\venv\Scripts\activate  
 
 # 3. Installer les dépendances
 pip install -r requirements.txt

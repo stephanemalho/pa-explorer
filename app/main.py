@@ -4,7 +4,7 @@ from fastapi import FastAPI
 
 from app.config import settings
 from app.database import Base, engine
-from app.routers import health
+from app.routers import health, servers
 
 
 @asynccontextmanager
@@ -21,3 +21,4 @@ app = FastAPI(
 )
 
 app.include_router(health.router, prefix="/api/v1")
+app.include_router(servers.router, prefix="/api/v1")

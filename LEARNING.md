@@ -87,3 +87,39 @@ https://www.ibm.com/docs/fr/planning-analytics/3.1.0?topic=api-managing-tm1-data
 
 ### Paramètres de TM1
     Il y a aussi les paramètres de TM1 que je n'ai pas bien saisi : https://www.    ibm.com/docs/fr/planning-analytics/3.1.0?topic=api-tm1-settings
+
+## retour au projet le 28/04/2026
+## Concepts techniques de la semaine deux.
+
+### Le pattern client API
+Quand une application doit parler à un service distant, on encapsule cette communication dans un module dédié qu'on appelle un client. Ce client est une couche d'abstraction qui isole le reste de l'application des détails du protocole HTTP, des URLs spécifiques, des headers d'authentification, et de la sérialisation. Le bénéfice principal est que si l'API distante change, tu modifies uniquement le client et le reste de ton code continue de fonctionner. Le bénéfice secondaire est que tu peux remplacer le vrai client par un mock pour tester ton application sans appeler la vraie API. Dans notre projet, le client IBM PA va vivre dans un dossier dédié et exposer des méthodes lisibles comme list_servers ou get_cube_dimensions, sans laisser fuiter dans l'application les détails de l'authentification ou des chemins d'URL.
+
+### La séparation métadonnées et données
+Une bonne architecture distingue les données qui décrivent la structure du système de celles qui en représentent les valeurs. Les métadonnées sont les informations relativement stables et de petite taille qui décrivent les entités du système, par exemple la liste des serveurs, la structure des cubes, les dimensions associées, les processus disponibles. Les données sont les valeurs numériques volumineuses qui peuplent ces structures, par exemple les chiffres de ventes par mois et par région. Ces deux types n'ont ni la même fréquence d'évolution, ni la même volumétrie, ni les mêmes patterns d'accès. Les modéliser séparément avec des technologies adaptées à chacun est une pratique d'architecte qui paye sur la durée. Dans notre projet, les métadonnées vont vivre dans une base relationnelle SQLite via SQLAlchemy, et les données volumineuses vont vivre dans des fichiers Parquet, qui est un format columnar optimisé pour la compression et la lecture sélective.
+
+### Le cache aside avec TTL
+Le cache aside est un pattern où l'application gère elle-même la lecture et l'écriture du cache, par opposition à un cache transparent. Quand une donnée est demandée, l'application regarde d'abord dans le cache. Si elle y est et qu'elle est encore valide selon un délai d'expiration appelé TTL pour Time To Live, l'application sert la donnée du cache. Sinon, l'application appelle la source de vérité, stocke le résultat dans le cache avec un nouveau TTL, et sert la donnée. Cette approche te donne un contrôle fin sur les politiques de fraîcheur, parce que tu peux donner des TTL différents selon le type de donnée, par exemple une heure pour la liste des serveurs qui change rarement, et cinq minutes pour les valeurs de cellules qui peuvent évoluer plus vite. Dans notre projet, le TTL sera stocké en colonne sur les tables de métadonnées, et la logique de cache vivra dans une couche service entre les routers et le client IBM PA.
+
+### L'injection de dépendance dans FastAPI
+FastAPI propose un mécanisme appelé Depends qui permet de déclarer dans la signature d'une route les services dont elle a besoin, sans les instancier elle-même. C'est l'équivalent moderne du pattern dependency injection en programmation orientée objet. Le bénéfice principal est la testabilité, parce que tu peux remplacer une dépendance réelle par un mock dans les tests sans toucher au code de la route. Le bénéfice secondaire est la lisibilité, parce que les dépendances sont déclarées explicitement plutôt que masquées dans le corps de la fonction. Dans notre projet, la session de base de données et le client IBM PA vont être injectés par Depends dans les routes qui en ont besoin, ce qui rendra le code plus modulaire et plus testable.
+
+### Le format Parquet
+Parquet est un format de fichier binaire pour stocker des données tabulaires de manière efficace. Il stocke les valeurs colonne par colonne plutôt que ligne par ligne, ce qui permet trois bénéfices majeurs. Premièrement, la compression est très efficace parce que les valeurs d'une même colonne sont souvent similaires. Deuxièmement, la lecture peut être sélective sur les colonnes nécessaires, ce qui évite de charger les données inutiles en mémoire. Troisièmement, le format est compatible avec tous les outils modernes de data analysis comme Pandas, PyArrow, DuckDB, et il est natif dans l'écosystème Spark si tu veux passer à grande échelle. Pour notre projet, les ensembles de cellules retournés par l'API IBM PA seront stockés en Parquet dans un dossier dédié, avec une convention de nommage qui permet de retrouver rapidement le fichier correspondant à une requête.
+
+### Mise en place des routes 
+get /api/v1/health
+get /api/v1/servers
+Post /api/v1/servers/refresh
+
+premier constat, tout fonctionne comme prévu, face a la lecture des données, mon premier réflexe est de comparer les attentes du code avec ce que la source retourne réellement, plutôt que de présumer un bug dans le code. 
+
+Leçon du jour: 
+1. La documentation d'une API et la réalité de ce qu'elle renvoie peuvent diverger. Le plan que Claude a produit s'appuyait sur la documentation IBM mais la réalité de mon tenant SaaS est différente de la doc. C'est pour ça que l'observation de raw-data est précieuse et donne la réalité du terrain.
+2. Les valeurs null dans une réponse ne sont pas forcement un bug. Elles peuvent simplement refléter une absence d'information à la source. Garder du recule sur la lecture des données.
+3. Une erreur runtime comme le 500 sur incluse_raw = false, fait partie intégrante du processus de validation. Tester deux appels au lieu d'un seul, c'est ce qui révèle ces bugs. Le débogage d'une erreur 500 sur une API REST suit toujours le même rituel. On part d'un symptôme observable côté client, ici le 500, et on remonte progressivement la chaîne de causes vers la racine du problème. Les outils principaux du remonté sont le traceback côté serveur, l'inspection de l'état des données qui transitent, et la comparaison entre cas qui marchent et cas qui plantent.
+   
+### Sur la suppression de pa_explorer.db
+C'est ici que je veux te ralentir une seconde, parce que la suppression de la base est correcte techniquement mais elle mérite que tu comprennes pourquoi c'est nécessaire.
+Quand tu ajoutes des colonnes à un modèle SQLAlchemy, il y a deux façons de propager ces nouvelles colonnes à la base existante. La première est une migration, c'est-à-dire un script qui modifie la structure de la base sans perdre les données existantes. C'est ce qu'on fait en production avec des outils comme Alembic. La seconde est de supprimer la base et de la laisser se recréer entièrement, ce qui efface tout l'historique mais garantit un schéma cohérent. C'est acceptable en développement quand les données sont volatiles et facilement reproductibles.
+Tu es exactement dans ce cas. Tes données sont rechargeables depuis IBM PA en quelques secondes, donc supprimer la base et la laisser se recréer est la bonne stratégie pour un environnement de dev. En production, ce serait inacceptable, mais nous sommes loin de la production.
+Note dans ton LEARNING.md ce concept de migration que tu vas rencontrer beaucoup plus formellement en semaine cinq ou six quand on parlera de la robustesse du projet. Pour l'instant, supprimer et recréer est notre stratégie acceptable.

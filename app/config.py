@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     ibm_pa_base_url: str
     ibm_pa_tenant_id: str
     ibm_pa_api_key: str
+    ibm_pa_servers_ttl_seconds: int = 300
 
 
 settings = Settings()

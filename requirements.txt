@@ -8,4 +8,3 @@ httpx==0.28.1
 # Dev / test
 pytest==8.3.5
 pytest-asyncio==0.25.3
-httpx  # also used as async test client
