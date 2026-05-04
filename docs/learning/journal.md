@@ -137,3 +137,14 @@ inacceptable en production où Alembic prend le relais.
 À la fin de la semaine 2, le projet expose une API REST fonctionnelle connectée 
 à IBM PA, avec un cache local, une gestion d'erreurs en sept catégories, et 
 une architecture en couches prête à accueillir les prochaines entités.
+
+## Session du 4 mai 2026 - Semaine 3, création du CLAUDE.md et teste de steering
+
+Session du début de semaine 3. Création du CLAUDE.md consolidé en 
+français à la racine du projet, suppression du CONTEXT_FOR_CLAUDE_CODE.md 
+devenu redondant. Premier test de steering réussi sur la consultation 
+de decisions.md à propos du choix de SQLite. Observation importante : 
+Claude Code lit bien les fichiers indiqués dans CLAUDE.md, mais peut 
+compléter ses réponses avec des inférences raisonnables qui ne sont 
+pas littéralement dans les sources. Pour les sujets où la fidélité 
+compte, prévoir d'ajouter une consigne explicite dans le prompt.

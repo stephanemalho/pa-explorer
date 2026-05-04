@@ -181,3 +181,43 @@ circonscrites, le mode direct est plus efficace.
 
 L'ouverture aux questions. Inviter Claude à poser des questions plutôt 
 que de faire des hypothèses silencieuses, surtout en début de feature.
+
+## P-005 — Prompt de fidélité stricte aux sources
+Contexte : Semaine 3, après avoir constaté que Claude Code complète parfois 
+ses réponses avec des inférences raisonnables non sourcées dans les fichiers 
+qu'il consulte. Pour les questions où la fidélité aux sources est critique, 
+comme une revue de décisions architecturales ou la recherche d'un précédent, 
+ce prompt impose une discipline stricte.
+
+### Le prompt
+"Pour répondre à ma question, consulte uniquement [nom du fichier ou des 
+fichiers]. Réponds strictement à partir de ce qui y est écrit littéralement, 
+sans inférer ni compléter avec des raisonnements qui ne sont pas dans le 
+texte. Si l'information demandée ne figure pas explicitement dans les 
+sources, indique-le clairement plutôt que de combler le vide.
+
+Voici ma question : [question]"
+
+### Analyse pédagogique
+Ce prompt traite un comportement spécifique de Claude Code, qui consiste à 
+formuler des réponses convaincantes en mêlant contenu sourcé et extrapolations 
+raisonnables. Pour la plupart des situations, ce comportement est utile parce 
+qu'il enrichit les réponses. Mais quand tu cherches à valider une décision 
+historique, à retrouver un précédent, ou à auditer une architecture, tu as 
+besoin de pouvoir distinguer ce qui est documenté de ce qui est inféré.
+
+Les éléments qui en font la qualité.
+
+L'instruction "réponds strictement à partir de ce qui y est écrit 
+littéralement" pose explicitement le contrat de fidélité.
+
+L'instruction "sans inférer ni compléter" nomme directement le comportement 
+indésirable, ce qui aide Claude à le supprimer.
+
+L'instruction "indique-le clairement" prévient le faux positif, c'est-à-dire 
+le cas où Claude complète parce qu'il a peur de paraître insuffisant.
+
+À retenir, ce prompt est utile pour les revues, audits, et questions sur 
+l'historique du projet. Pour les questions de conception ou les nouvelles 
+features, l'inférence raisonnable est au contraire utile et il ne faut pas 
+la brider.
