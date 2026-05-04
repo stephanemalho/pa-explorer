@@ -156,6 +156,11 @@ une décision technique est questionnée ou doit être révisée.
 Analytics. Endpoints découverts, particularités d'authentification, 
 structure des réponses, concepts du domaine TM1.
 
+**docs/skills/add_ibm_pa_endpoint.md** — Procédure réutilisable pour 
+ajouter un nouvel endpoint IBM PA suivant le pattern établi en 
+semaine 2. À consulter chaque fois que l'utilisateur demande "ajoute 
+un endpoint pour [entité IBM PA]" comme Cubes, Dimensions, Processes.
+
 **docs/learning/concepts.md** — Notes synthétiques sur les concepts 
 techniques (SQLAlchemy, FastAPI, Pydantic, patterns de cache, etc.) 
 organisés par thème.
@@ -186,3 +191,8 @@ Toujours respecter la séparation client/service/router/model/schema
 décrite plus haut. Si une feature ne s'inscrit pas dans ce pattern, 
 proposer une nouvelle convention plutôt que de la contourner 
 silencieusement.
+
+Quand l'utilisateur demande l'ajout d'un endpoint IBM PA, consulter 
+systématiquement docs/skills/add_ibm_pa_endpoint.md avant de proposer 
+un plan d'implémentation. Cette compétence formalise le pattern de 
+référence pour assurer la cohérence entre les différentes entités.
