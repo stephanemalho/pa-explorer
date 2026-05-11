@@ -149,16 +149,14 @@ compléter ses réponses avec des inférences raisonnables qui ne sont
 pas littéralement dans les sources. Pour les sujets où la fidélité 
 compte, prévoir d'ajouter une consigne explicite dans le prompt.
 
-## Session du 11/05/2026 - Semaine 3, integration de la route GET cubes /api/v1/servers/{server_name}/cubes
-
-Découverte d'un bug intéréssant, la limitation de str.format en Python qui ne fait pas de format partiel, contrairement à ce qu'on pourrait intuitivement penser. C'est une connaissance Python utile pour la suite.
-
-Activation du /Compact automatique par claude. Jai appris que Claude Code créer un répertoire dans :
-
-```bash
+## Session du 11/05/2026 — Semaine 3 : intégration de la route GET /api/v1/servers/{server_name}/cubes
+Apprentissages techniques
+Mise en évidence d’une limitation de str.format en Python : la méthode ne prend pas en charge le formatage partiel, contrairement à ce que l’on pourrait supposer intuitivement. Point à retenir pour les développements futurs.
+Fonctionnement de Claude Code — gestion de l’historique
+Activation automatique de la commande /compact durant la session. À cette occasion, j’ai identifié que Claude Code conserve l’historique des conversations dans le répertoire suivant :
 C:\Users\smalho\.claude\projects\c--Users-smalho-Desktop-pa-explorer
-```
-
-Il y stock l'historique des discussions meme après le compact, il est possible de retrouver l'historique complet de la discussion d'un projet.
-
-J'ai aussi remarqué quelque chose d'intéressant, claude crée un .claude dans mon répertoire Utilisateurs, et il garde l'entièreté des discussions avant compact (c'est une impréssion que j'ai) car il à dit apres le compact: If you need specific details from before compaction (like exact code snippets, error messages, or content you generate) read the full transcript at: C:\Users\smalho\.claude\projects\c--Users-smalho-Desktop-pa-explorer\1dbc581c-4ea4-46b7-b946-20337976817b.jsonl, Donc je pense qu'il est possible de retrouver un historique complet des discusssions meme si c'est pas très lisible pour humain. Je me demande s'il est necessaire de nettoyer cela si je supprime un projet ou s'il devient trop gros dans le temps. Mais c'est un bon apprentissage pour le moment.
+L’historique complet d’un projet y reste accessible, y compris après l’exécution de /compact. Après la compaction, Claude m’a explicitement indiqué :
+« If you need specific details from before compaction (like exact code snippets, error messages, or content you generate) read the full transcript at: C:\Users\smalho.claude\projects\c–Users-smalho-Desktop-pa-explorer\1dbc581c-4ea4-46b7-b946-20337976817b.jsonl »
+Il semble donc possible de récupérer l’intégralité des échanges, bien que le format .jsonl ne soit pas particulièrement lisible pour un humain.
+Point ouvert
+Reste à déterminer s’il est nécessaire de nettoyer ce répertoire lors de la suppression d’un projet, ou si une purge périodique est requise pour éviter une croissance excessive du dossier .claude dans le temps.
