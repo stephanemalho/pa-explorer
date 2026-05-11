@@ -60,7 +60,7 @@ d'une feature avec Plan Mode, boucle Plan-Execute-Clear. Première feature
 métier réelle de listing des serveurs TM1 avec authentification IBM PA, 
 client httpx, pattern cache aside, gestion d'erreurs structurée.
 
-### Semaine 3 — Steering avec Agents.md [À VENIR]
+### Semaine 3 — Steering avec Agents.md [EN COURS]
 Création d'un fichier Agents.md ou CLAUDE.md qui devient le manuel 
 d'utilisation de Claude Code sur ce projet. Principe de divulgation 
 progressive de l'information. Découverte des skills et écriture du 
