@@ -149,7 +149,7 @@ compléter ses réponses avec des inférences raisonnables qui ne sont
 pas littéralement dans les sources. Pour les sujets où la fidélité 
 compte, prévoir d'ajouter une consigne explicite dans le prompt.
 
-## Session du 11/05/2026 — Semaine 3 : intégration de la route GET /api/v1/servers/{server_name}/cubes
+## Session du 11 mai 2026 — Semaine 3 : intégration de la route GET /api/v1/servers/{server_name}/cubes
 Apprentissages techniques
 Mise en évidence d’une limitation de str.format en Python : la méthode ne prend pas en charge le formatage partiel, contrairement à ce que l’on pourrait supposer intuitivement. Point à retenir pour les développements futurs.
 Fonctionnement de Claude Code — gestion de l’historique
