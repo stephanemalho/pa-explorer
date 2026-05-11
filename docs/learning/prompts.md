@@ -221,3 +221,90 @@ le cas où Claude complète parce qu'il a peur de paraître insuffisant.
 l'historique du projet. Pour les questions de conception ou les nouvelles 
 features, l'inférence raisonnable est au contraire utile et il ne faut pas 
 la brider.
+
+## P-006 — Prompt de correction de bug avec diagnostic basé sur traceback
+Contexte : Semaine 3, après l'implémentation de list_cubes via la 
+compétence add_ibm_pa_endpoint. Le premier test runtime a produit un 
+500 Internal Server Error sur GET /api/v1/servers/{server_name}/cubes. 
+L'activation du log-level debug a permis de récupérer le traceback 
+complet et d'identifier la cause exacte avant de demander la correction.
+
+### Le prompt
+"Bug à corriger sur la feature cubes.
+
+Symptôme observable. L'endpoint GET /api/v1/servers/Seminaire/cubes 
+retourne un Internal Server Error 500. Le traceback complet pointe vers 
+app/clients/ibm_pa.py ligne 45 dans la méthode _url, avec une KeyError 
+sur server_name.
+
+Cause confirmée par le traceback. La méthode _url fait 
+path.format(tenant_id=...) mais le _CUBES_PATH contient deux variables 
+à substituer, tenant_id et server_name. Python ne fait pas de format 
+partiel, donc il lève KeyError quand il rencontre {server_name} sans 
+valeur fournie.
+
+Le plan initial avait anticipé un double format chaîné, mais cela ne 
+fonctionne pas avec str.format en Python.
+
+Correction proposée. Modifier la méthode _url pour qu'elle accepte des 
+kwargs additionnels qu'elle passe au format. Cela généralise la méthode 
+pour tous les futurs endpoints avec des variables additionnelles dans 
+l'URL.
+
+```python
+def _url(self, path: str, **kwargs) -> str:
+    return f"{self._base_url}{path.format(tenant_id=self._tenant_id, **kwargs)}"
+```
+
+Puis adapter get_cubes pour utiliser cette nouvelle signature.
+
+```python
+url = self._url(self._CUBES_PATH, server_name=server_name)
+```
+
+Vérifie aussi que get_servers continue de fonctionner sans changement, 
+puisque l'API de _url reste rétrocompatible quand aucun kwargs n'est 
+fourni.
+
+Pas de plan en amont, exécute directement."
+
+### Analyse pédagogique
+Ce prompt illustre la puissance du diagnostic précis en amont d'une 
+demande de correction. Plutôt que de soumettre à Claude Code un vague 
+"corrige le 500", on lui livre quatre éléments structurés qui rendent 
+la correction quasi-déterministe.
+
+Les éléments qui en font la qualité.
+
+La distinction explicite entre symptôme observable et cause confirmée 
+préserve le périmètre d'investigation de Claude. Le symptôme est ce 
+que l'utilisateur a vu, la cause est ce que le traceback a révélé. 
+Cette structure aide Claude à comprendre qu'on ne lui demande pas de 
+deviner, mais de coder une correction déjà conçue.
+
+La mention explicite de l'origine de l'erreur, c'est-à-dire le plan 
+initial qui avait anticipé un double format chaîné non viable, montre 
+qu'on a déjà fait l'effort intellectuel de comprendre pourquoi le 
+plan initial ne marchait pas. Cela évite à Claude de proposer la même 
+correction défaillante.
+
+La correction proposée est donnée explicitement en code, ce qui retire 
+l'ambiguïté sur l'approche attendue. Mais elle est aussi justifiée par 
+sa portée future, c'est-à-dire la généralisation pour les prochains 
+endpoints. Cela transforme une correction ponctuelle en amélioration 
+architecturale.
+
+La vérification de la non-régression sur get_servers est demandée 
+explicitement. Sans cela, Claude pourrait casser l'endpoint existant 
+en modifiant la signature de _url.
+
+La directive finale "Pas de plan en amont, exécute directement" 
+assume le mode direct, parce que le diagnostic et la correction sont 
+suffisamment précis pour ne pas justifier un Plan Mode.
+
+À retenir. Ce pattern de prompt est applicable à tout bug où tu as 
+accès au traceback ou au message d'erreur précis. La règle générale 
+est de structurer ta demande en quatre temps. Symptôme observable, 
+cause confirmée par la preuve technique, correction proposée avec 
+justification, vérification de non-régression. Plus le diagnostic 
+est partagé en amont, plus la correction est rapide et fiable.
