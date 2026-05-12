@@ -165,3 +165,10 @@ J'ai aussi remarqué quelque chose d'intéressant, claude crée un .claude dans 
 
 Je viens de découvrir que mon tenant Seminaire contient des cubes avec une vraie complexité métier TM1. Le cube Categories Salaires a des règles de calcul TurboIntegrator complètes, des feeders auto-générés, des dimensions multiples qui apparaissent dans les règles comme annee, phase, categories_salaires, mois, salaires. J'ai aussi des attributs comme Caption qui me donnent un nom d'affichage en anglais Salary categories.
 Cette richesse ouvre énormément de portes pour la suite de mon projet. On pourra un jour exposer ces règles dans un éditeur, visualiser les dépendances entre cubes via les feeders, suivre les dates de mise à jour pour détecter les changements. Mais on ne fera pas tout cela maintenant, sinon on perdrait le cap.
+
+### Command :
+Taper le symbole :
+```bash
+ / 
+```
+ afin de lister l'ensemble des commandes disponobles pour Claude Code.
