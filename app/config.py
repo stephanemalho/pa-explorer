@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     ibm_pa_api_key: str
     ibm_pa_servers_ttl_seconds: int = 300
     ibm_pa_cubes_ttl_seconds: int = 300
+    ibm_pa_dimensions_ttl_seconds: int = 300
 
 
 settings = Settings()

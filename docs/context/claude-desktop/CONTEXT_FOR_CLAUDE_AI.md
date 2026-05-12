@@ -66,15 +66,18 @@ authentification IBM PA SaaS via apikey, client httpx, pattern cache
 aside avec TTL configurable, gestion d'erreurs en sept types d'exceptions 
 métier, exposition de routes GET et POST avec Swagger.
 
-Semaine 3 accomplie. Création du CLAUDE.md consolidé en français à la 
-racine du projet pour le steering automatique de Claude Code. Création 
-du skill add_ibm_pa_endpoint.md dans docs/skills qui formalise la 
-procédure d'ajout d'un endpoint IBM PA. Application concrète sur 
-list_cubes qui expose maintenant la liste des cubes TM1 par serveur. 
-Découverte de la richesse réelle des cubes IBM PA avec règles de calcul, 
-feeders et attributs. Découverte d'un piège Python sur str.format qui 
-ne fait pas de format partiel, contourné par généralisation de la 
-méthode _url du client.
+Semaine 3 accomplie. Création du CLAUDE.md consolidé en français à 
+la racine du projet pour le steering automatique de Claude Code. 
+Création du skill add_ibm_pa_endpoint.md dans docs/skills qui 
+formalise la procédure d'ajout d'un endpoint IBM PA. Application 
+concrète sur list_cubes qui expose maintenant la liste des cubes 
+TM1 par serveur. Découverte de la richesse réelle des cubes IBM PA 
+avec règles de calcul, feeders et attributs. Découverte d'un piège 
+Python sur str.format qui ne fait pas de format partiel, contourné 
+par généralisation de la méthode _url du client. Test de validation 
+du steering effectué sur list_dimensions, qui a confirmé que Claude 
+Code consulte bien les fichiers de référence et applique les patterns 
+documentés.
 
 ## Mode de travail établi entre nous
 
