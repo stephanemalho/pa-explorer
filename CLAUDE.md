@@ -180,6 +180,11 @@ fil du parcours, avec leur note pédagogique.
 documentaire et vue d'ensemble du parcours d'apprentissage en 
 huit semaines.
 
+**docs/roadmap/multi_version_support.md** — Vision long terme pour le 
+support simultané des versions V11 et V12 d'IBM PA dans PA-Explorer. 
+Document de direction architecturale à consulter avant tout choix qui 
+pourrait limiter la capacité future à supporter les deux versions.
+
 **README.md** à la racine — Procédures opérationnelles complètes, 
 commandes de développement, gestion de la base de données.
 
