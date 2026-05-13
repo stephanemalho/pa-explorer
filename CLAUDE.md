@@ -201,3 +201,8 @@ Quand l'utilisateur demande l'ajout d'un endpoint IBM PA, consulter
 systématiquement docs/skills/add_ibm_pa_endpoint.md avant de proposer 
 un plan d'implémentation. Cette compétence formalise le pattern de 
 référence pour assurer la cohérence entre les différentes entités.
+
+## Conventions Git
+
+Les messages de commit suivent le pattern conventional commits.
+type(scope): description courte en anglais à l'impératif
