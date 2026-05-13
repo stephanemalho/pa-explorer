@@ -9,16 +9,6 @@ signalé comme connaissance générale.
 
 ---
 
-## CLAUDE - Piège a connaitre 
-
-### Inférence raisonnable
-
-Claude Code a fait ce qu'on appelle de l'inférence raisonnable. Il a lu le contenu factuel de mon fichier, et il a complété avec des éléments qui sont logiques mais non sourcés. Les trois raisons pratiques sont vraies et défendables, mais ce sont les siennes, pas celles que j'avais documentées. Il a lu le document desisions.md et l'affirmation sur D-003 et D-008 est plausible mais elle prête une intention qui n'est pas explicite dans tes fichiers.
-C'est exactement le type de comportement contre lequel on doit rester vigilant. Claude Code répond avec confiance et formate sa réponse de manière convaincante, ce qui peut donner l'impression que tout vient de tes documents. Mais une partie significative est de l'extrapolation.
-C'est une leçon importante pour la suite de mon parcours. Un bon steering ne suffit pas à garantir que Claude Code restera strictement factuel. Le fichier CLAUDE.md et les fichiers learning donnent à Claude Code un cadre de référence, mais ils ne l'empêchent pas de combler les vides avec ses propres raisonnements quand il sent qu'une réponse plus complète serait attendue.
-
----
-
 ## Python et écosystème
 
 ### L'environnement virtuel (venv)

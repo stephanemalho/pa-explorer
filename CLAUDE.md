@@ -161,6 +161,11 @@ ajouter un nouvel endpoint IBM PA suivant le pattern établi en
 semaine 2. À consulter chaque fois que l'utilisateur demande "ajoute 
 un endpoint pour [entité IBM PA]" comme Cubes, Dimensions, Processes.
 
+**docs/learning/claude_code_concepts.md** — Notes spécifiques sur Claude Code, 
+ses comportements à connaître, ses commandes utiles, et les patterns 
+de collaboration. À consulter pour les questions sur l'outil lui-même 
+plutôt que sur le projet.
+
 **docs/learning/concepts.md** — Notes synthétiques sur les concepts 
 techniques (SQLAlchemy, FastAPI, Pydantic, patterns de cache, etc.) 
 organisés par thème.
