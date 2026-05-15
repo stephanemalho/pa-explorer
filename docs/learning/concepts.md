@@ -64,6 +64,95 @@ dans ce module, et `--reload` active le rechargement automatique quand un
 fichier source est modifié. (Analogie JavaScript issue de LEARNING.md : 
 `python -m uvicorn app.main:app --reload` ≈ `pnpm run dev`.)
 
+### Process Windows, PID et changement de branche
+
+Un process est un programme en cours d'exécution sur la machine. Quand on lance 
+Uvicorn avec `--reload`, Windows crée au moins un process Python, souvent deux :
+
+- un process parent, qui surveille les fichiers ;
+- un process enfant, qui exécute réellement l'application FastAPI.
+
+Chaque process a un identifiant appelé PID. Git change les fichiers sur le 
+disque quand on change de branche, mais il ne tue pas les process déjà lancés. 
+Donc un ancien `uvicorn --reload` peut continuer à servir l'ancien code, et 
+Swagger peut encore afficher les anciennes routes même si `app/main.py` ne les 
+contient plus.
+
+Réflexe recommandé avant ou juste après un changement de branche :
+
+1. Arrêter le serveur Uvicorn actif.
+2. Vérifier que le port `8000` est libre.
+3. Relancer Uvicorn depuis le bon dossier et le bon `venv`.
+4. Vérifier que Python importe bien le fichier attendu.
+
+Voir les process qui écoutent sur le port `8000` :
+
+```powershell
+Get-NetTCPConnection -LocalPort 8000 -State Listen -ErrorAction SilentlyContinue |
+    Select-Object LocalAddress, LocalPort, OwningProcess
+```
+
+`OwningProcess` est le PID. Pour voir le détail d'un PID :
+
+```powershell
+Get-CimInstance Win32_Process -Filter "ProcessId = 23820" |
+    Select-Object ProcessId, ParentProcessId, Name, CommandLine
+```
+
+Lister les process Uvicorn actifs, peu importe le port :
+
+```powershell
+Get-CimInstance Win32_Process |
+    Where-Object { $_.CommandLine -match "uvicorn|app.main:app" } |
+    Select-Object ProcessId, ParentProcessId, Name, CommandLine
+```
+
+Arrêter tout ce qui écoute sur `8000` :
+
+```powershell
+Get-NetTCPConnection -LocalPort 8000 -State Listen -ErrorAction SilentlyContinue |
+    Select-Object -ExpandProperty OwningProcess -Unique |
+    ForEach-Object { Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue }
+```
+
+Vérifier que le port est libre :
+
+```powershell
+Get-NetTCPConnection -LocalPort 8000 -State Listen -ErrorAction SilentlyContinue
+```
+
+Si la commande ne retourne rien, aucun serveur n'écoute sur ce port.
+
+Vérifier que le module importé vient bien du projet courant :
+
+```powershell
+.\venv\Scripts\python.exe -c "import app.main; print(app.main.__file__)"
+```
+
+Le résultat attendu dans ce projet est :
+
+```text
+C:\Users\smalho\Desktop\pa-explorer\app\main.py
+```
+
+Relancer proprement :
+
+```powershell
+.\venv\Scripts\python.exe -m uvicorn app.main:app --reload
+```
+
+Vérifier les routes exposées par FastAPI :
+
+```powershell
+(Invoke-RestMethod http://localhost:8000/openapi.json).paths.PSObject.Properties.Name
+```
+
+Oui, il est préférable d'arrêter le terminal ou au minimum d'arrêter Uvicorn 
+avant de changer de branche. Fermer le terminal tue généralement le process 
+parent lancé dans ce terminal. C'est une bonne habitude en développement, 
+surtout avec `--reload`, car cela évite de mélanger le code chargé en mémoire 
+avec les fichiers d'une autre branche.
+
 ### Les routers
 
 Un router FastAPI (`APIRouter`) est un regroupement d'endpoints liés par un 
