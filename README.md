@@ -49,6 +49,19 @@ La documentation interactive Swagger est accessible sur `http://localhost:8000/d
 4. Lancer le serveur : `python -m uvicorn app.main:app --reload`
 5. Ouvrir Swagger : http://localhost:8000/docs
 
+### Diagnostiquer l'état de la base
+
+Pour vérifier rapidement l'état de la base SQLite, exécuter le script 
+de diagnostic.
+
+\`\`\`powershell
+python scripts/check_db.py
+\`\`\`
+
+Le script liste toutes les tables présentes et le nombre de lignes 
+par table. Il affiche aussi le contenu des tables de référence comme 
+user_allowlist.
+
 ### Réinitialiser la base après modification d'un modèle
 1. Arrêter uvicorn avec Ctrl+C
 2. Fermer l'onglet pa_explorer.db dans VS Code (s'il est ouvert)
