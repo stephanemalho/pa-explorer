@@ -94,6 +94,8 @@ réinitialisée (`reset_db.ps1`). Ne jamais la committer dans git.
 | `IBM_PA_BASE_URL` | URL de base IBM PA SaaS | `https://eu-central-1.planninganalytics.saas.ibm.com` |
 | `IBM_PA_TENANT_ID` | Identifiant du tenant IBM PA | `your-tenant-id` |
 | `IBM_PA_API_KEY` | Clé API IBM PA | `your-api-key` |
+| `PA_EXPLORER_ENCRYPTION_KEY` | Clé Fernet 44 chars pour chiffrer les credentials utilisateur | Générer via `Fernet.generate_key()` |
+| `PA_EXPLORER_INITIAL_ADMIN_EMAIL` | Email pré-autorisé dans UserAllowlist au démarrage | `admin@example.com` |
 
 ## Endpoints
 

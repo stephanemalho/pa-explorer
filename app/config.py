@@ -24,5 +24,11 @@ class Settings(BaseSettings):
     ibm_pa_cubes_ttl_seconds: int = 300
     ibm_pa_dimensions_ttl_seconds: int = 300
 
+    # Auth
+    pa_explorer_encryption_key: str
+    pa_explorer_initial_admin_email: str
+    auth_session_ttl_hours: int = 24
+    auth_magic_link_ttl_minutes: int = 15
+
 
 settings = Settings()
