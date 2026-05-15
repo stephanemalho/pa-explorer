@@ -73,9 +73,9 @@ sans migration de schéma.
   l'anticipe, mais l'implémentation est dans la roadmap semaines 5-8.
 - L'interface frontend de saisie du formulaire — ce PRD définit les
   endpoints backend. Les formulaires HTML restent hors scope.
-- L'envoi d'email réel en production — en développement, le token est
-  retourné dans la réponse JSON. L'intégration d'un service d'email
-  (SendGrid, SES) est hors scope.
+- L'envoi d'email réel — en développement, le lien est loggé dans la
+  console uvicorn. L'intégration d'un service d'email (Mailtrap,
+  SendGrid, SES) est prévue en semaine 5 (cf. section 11).
 - La révocation de session ou la déconnexion explicite — couvert dans
   une itération ultérieure.
 
@@ -127,10 +127,11 @@ sont sérialisés en JSON et chiffrés avec Fernet avant persistence.
 Un token `MagicLinkToken` est généré via `secrets.token_urlsafe(32)`.
 Il est associé à l'utilisateur avec une expiration de 15 minutes.
 
-En mode développement (`DEBUG=true`), le lien de vérification est
-retourné directement dans le corps JSON de la réponse, pour faciliter
-les tests via Swagger. En mode production, l'email est envoyé via un
-service d'envoi (hors scope) et la réponse est un 204.
+Le lien de vérification est loggé dans la console uvicorn via le
+logger Python standard (niveau INFO), de façon à pouvoir le copier
+pendant les tests. Aucune réponse JSON ne contient le token — la
+réponse HTTP est toujours un 200 avec un message générique.
+L'envoi par email réel est prévu en début de semaine 5 (cf. section 11).
 
 ### Étape B — Validation du magic link
 
@@ -221,27 +222,84 @@ le cookie HTTP — jamais l'`id` entier ou l'email.
 Le champ `last_used_at` est réservé pour un mécanisme de prolongation
 de session futur. Dans cette phase, il n'est pas mis à jour.
 
+### Modèle UserAllowlist
+
+Fichier cible : `app/models/user_allowlist.py`
+
+Table `user_allowlist` avec les colonnes suivantes :
+
+| Colonne | Type SQLAlchemy | Contraintes |
+|---|---|---|
+| `id` | Integer | PK, autoincrement |
+| `email` | String(255) | unique, nullable=False, index=True |
+| `created_at` | DateTime(timezone=True) | server_default=func.now() |
+
+Ce modèle implémente un contrôle d'accès par liste blanche. Avant de
+traiter une demande d'authentification, le service vérifie que l'email
+du demandeur figure dans cette table. Si l'email est absent, la
+création du magic link est rejetée avec HTTP 403 et le message :
+`"Accès non autorisé. Contactez l'administrateur pour obtenir une invitation."`.
+
+**Seed initial** : au premier démarrage, la table doit contenir au moins
+l'email du développeur principal. Cet email est configurable via la
+variable `PA_EXPLORER_INITIAL_ADMIN_EMAIL` dans `.env.local`. L'insertion
+se fait dans le bloc `lifespan` de `app/main.py` ou via un script de seed
+dédié, au choix de l'implémenteur — l'important est que la table ne
+soit jamais vide au démarrage d'un environnement neuf.
+
+### Validation des credentials IBM PA
+
+Avant de persister les credentials et de générer le magic link, le
+service doit vérifier que l'api_key fournie est effectivement valide
+en faisant un appel léger à IBM PA :
+
+```
+GET /api/<tenant_id>/v0/tm1/Servers
+```
+
+Ce endpoint est le plus simple disponible et ne requiert pas de
+paramètre supplémentaire. Il suffit à confirmer que l'api_key est
+acceptée par IBM PA.
+
+Comportement attendu selon la réponse IBM PA :
+
+- **Réponse 200** : credentials valides, on continue le flow.
+- **Réponse 401** : api_key invalide ou révoquée. Rejet HTTP 400 avec
+  message : `"Clé API IBM PA invalide. Vérifiez votre api_key."`.
+- **Timeout ou erreur réseau** : IBM PA injoignable. Rejet HTTP 400
+  avec message : `"Impossible de joindre IBM PA pour valider les
+  credentials. Réessayez."`.
+- **Autre erreur IBM PA (5xx, 403)** : Rejet HTTP 400 avec message
+  adapté au code d'erreur.
+
+Cette validation utilise le `IBMPAClient` existant avec la gestion
+d'exceptions `IBMPAAuthError`, `IBMPATimeoutError`, `IBMPAConnectionError`
+déjà en place. Pas de nouvelle logique d'appel HTTP à créer.
+
 ### Chiffrement Fernet
 
 La clé de chiffrement est une variable d'environnement
-`AUTH_ENCRYPTION_KEY`, une chaîne base64url de 32 octets encodée pour
-Fernet. En développement, une valeur fixe suffit. La bibliothèque
-cible est `cryptography` (déjà dans l'écosystème Python courant).
+`PA_EXPLORER_ENCRYPTION_KEY`, une chaîne base64url de 44 caractères
+générée par Fernet. La bibliothèque cible est `cryptography`.
 
 La méthode de chiffrement et de déchiffrement est encapsulée dans
 `app/services/auth_service.py`. Elle ne doit pas être dispersée dans
 les routers.
 
-Pour générer une clé de développement :
+Procédure de génération de la clé (à faire une seule fois par
+environnement) :
 ```
 python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
 ```
+Copier la valeur affichée (44 caractères) dans `.env.local` sous la
+variable `PA_EXPLORER_ENCRYPTION_KEY`. Ne jamais la versionner.
 
 ### Configuration
 
 `app/config.py` doit être étendu avec :
 ```
-auth_encryption_key: str
+pa_explorer_encryption_key: str
+pa_explorer_initial_admin_email: str
 auth_session_ttl_hours: int = 24
 auth_magic_link_ttl_minutes: int = 15
 ```
@@ -252,25 +310,31 @@ auth_magic_link_ttl_minutes: int = 15
 
 - `app/models/user.py` — modèle `User`
 - `app/models/user_session.py` — modèle `UserSession`
+- `app/models/user_allowlist.py` — modèle `UserAllowlist`
 - `app/schemas/auth.py` — schéma Pydantic `AuthRequest` (email,
   ibm_pa_version, credentials_payload)
 - `app/services/auth_service.py` — classe `AuthService` avec méthodes
   `encrypt_credentials`, `decrypt_credentials`, `create_or_update_user`,
-  `get_session_by_token`
-- `app/config.py` étendu avec les variables auth
-- `.env.example` mis à jour
-- `app/main.py` mis à jour pour importer les modèles `user` et
-  `user_session` (noqa F401) afin que `create_all` les enregistre
+  `get_session_by_token`, `check_allowlist`, `validate_ibm_pa_credentials`
+- `app/config.py` étendu avec `pa_explorer_encryption_key`,
+  `pa_explorer_initial_admin_email`, TTL auth
+- `.env.example` mis à jour avec les nouvelles variables
+- `app/main.py` mis à jour pour importer les trois nouveaux modèles
+  (noqa F401) et pour seeder `UserAllowlist` avec
+  `pa_explorer_initial_admin_email` au démarrage
 - `reset_db.ps1` à ré-exécuter pour recréer la base avec les nouvelles
   tables
 
 ### Critères de validation de la Phase 1
 
 1. `python -m uvicorn app.main:app --reload` démarre sans erreur.
-2. Les tables `users` et `user_sessions` sont visibles dans `pa_explorer.db`.
-3. Le schéma `AuthRequest` est exposé dans la documentation Swagger
+2. Les tables `users`, `user_sessions` et `user_allowlist` sont
+   visibles dans `pa_explorer.db`.
+3. La table `user_allowlist` contient une ligne avec l'email défini
+   dans `PA_EXPLORER_INITIAL_ADMIN_EMAIL` dès le premier démarrage.
+4. Le schéma `AuthRequest` est exposé dans la documentation Swagger
    sous `/docs`.
-4. Une ligne insérée manuellement en base avec des credentials JSON
+5. Une ligne insérée manuellement en base avec des credentials JSON
    chiffrés n'est pas lisible en clair dans le champ
    `credentials_encrypted`.
 
@@ -319,21 +383,26 @@ ultérieure retourne 401.
 ```
 
 **Traitement** :
-1. Chiffrer `credentials_payload` avec Fernet.
-2. Créer ou mettre à jour le `User` (upsert sur email).
-3. Créer un `MagicLinkToken` avec expiration à maintenant + 15 minutes.
-4. Construire l'URL de vérification : `<base_url>/api/v1/auth/verify?token=<token>`.
+1. Vérifier que l'email figure dans `UserAllowlist`. Si absent : HTTP 403
+   avec message `"Accès non autorisé. Contactez l'administrateur pour obtenir une invitation."`.
+2. Valider les credentials contre IBM PA via `IBMPAClient.get_servers()`
+   (instancié avec les credentials fournis). Selon la réponse :
+   - 401 IBM PA → HTTP 400 `"Clé API IBM PA invalide. Vérifiez votre api_key."`
+   - Timeout → HTTP 400 `"Impossible de joindre IBM PA pour valider les credentials. Réessayez."`
+   - Autre erreur IBM PA → HTTP 400 avec message adapté au code.
+3. Chiffrer `credentials_payload` avec Fernet.
+4. Créer ou mettre à jour le `User` (upsert sur email).
+5. Créer un `MagicLinkToken` avec expiration à maintenant + 15 minutes.
+6. Construire l'URL de vérification et la logger dans la console uvicorn
+   (niveau INFO) : `logger.info("Magic link: %s", verify_url)`.
 
-**Réponse en mode développement** (`DEBUG=true`) :
+**Réponse** : HTTP 200 avec message générique.
 ```json
-{
-  "message": "Magic link généré.",
-  "verify_url": "http://localhost:8000/api/v1/auth/verify?token=<token>"
-}
+{"message": "Un lien d'authentification a été généré. Consultez les logs uvicorn."}
 ```
 
-**Réponse en mode production** : HTTP 204 No Content. Le lien est envoyé
-par email (intégration email hors scope).
+Le token n'apparaît jamais dans le corps de la réponse HTTP. En semaine 5,
+cette étape sera remplacée par un envoi par email réel (cf. section 11).
 
 ### Endpoint GET /api/v1/auth/verify
 
@@ -572,3 +641,57 @@ anciens tokens sur chaque nouvelle demande.
 
 Ajouter `cryptography` dans `requirements.txt`. Vérifier la compatibilité
 avec Python 3.12.
+
+### Avertissement — perte de la clé PA_EXPLORER_ENCRYPTION_KEY
+
+La clé Fernet est le seul moyen de déchiffrer les credentials IBM PA
+stockés en base. Si `PA_EXPLORER_ENCRYPTION_KEY` est perdue, modifiée
+ou régénérée, toutes les entrées `credentials_encrypted` de la table
+`users` deviennent illisibles. La seule procédure de récupération est
+de réinitialiser la base (`reset_db.ps1`), de regénérer une clé, et de
+demander à tous les utilisateurs de se ré-enregistrer.
+
+**Procédure de génération initiale** (une seule fois par environnement) :
+
+```bash
+python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+```
+
+La commande affiche une chaîne de 44 caractères. La copier dans
+`.env.local` :
+
+```
+PA_EXPLORER_ENCRYPTION_KEY=<chaîne de 44 caractères>
+```
+
+Ne jamais committer cette valeur dans git. Ne jamais l'afficher dans
+les logs. Ne pas confondre avec `IBM_PA_API_KEY` — ce sont deux secrets
+distincts avec des cycles de vie différents.
+
+Les bonnes pratiques de gestion de clé en production (rotation, stockage
+dans un secret manager, audit d'accès) seront abordées dans les semaines
+avancées du parcours.
+
+---
+
+## 11. Évolutions prévues
+
+### Envoi du magic link par email — début de semaine 5
+
+Dans la version semaine 4 décrite par ce PRD, le lien de vérification
+est loggé dans la console uvicorn. Cette approche est fonctionnelle pour
+un développement solo et simplifie le démarrage sans dépendance externe.
+
+En début de semaine 5, une session de suivi ajoutera l'envoi par email
+réel via **Mailtrap** (service de sandbox email pour le développement)
+ou un équivalent. Cette évolution touchera uniquement la méthode
+`create_magic_link` de `AuthService` et n'impactera pas les modèles
+ni les autres couches.
+
+Le choix de Mailtrap est motivé par sa capacité à intercepter les emails
+envoyés sans les délivrer réellement, ce qui maintient un environnement
+de développement sûr tout en testant le rendu des emails.
+
+L'intégration d'un service d'envoi transactionnel en production
+(SendGrid, Amazon SES, Brevo, ou autre) sera traitée comme une décision
+d'infrastructure séparée, documentée dans `decisions.md` au moment du choix.

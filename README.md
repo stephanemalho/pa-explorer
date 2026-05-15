@@ -23,8 +23,8 @@ source .venv/bin/activate        # Linux/macOS
 pip install -r requirements.txt
 
 # 4. Configurer les variables d'environnement
-cp .env.example .env
-# Éditer .env et renseigner les valeurs IBM_PA_TENANT_ID et IBM_PA_API_KEY
+cp .env.example .env.local
+# Éditer .env.local et renseigner les valeurs IBM_PA_TENANT_ID et IBM_PA_API_KEY
 ```
 
 ## Lancement
@@ -60,6 +60,28 @@ Si la suppression échoue avec un message "fichier en cours d'utilisation" :
 1. Lister les processus Python : `Get-Process | Where-Object {$_.ProcessName -like "*python*"}`
 2. Tuer les instances : `Get-Process python3.12 | Stop-Process -Force`
 3. Réessayer la suppression
+
+## Gestion de la clé de chiffrement Fernet
+
+PA-Explorer chiffre les credentials IBM PA des utilisateurs avec Fernet
+(bibliothèque `cryptography`). La clé doit être générée une seule fois
+par environnement et copiée dans `.env.local`.
+
+**Générer la clé :**
+
+```powershell
+python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+```
+
+La commande affiche une chaîne de 44 caractères. L'ajouter dans `.env.local` :
+
+```
+PA_EXPLORER_ENCRYPTION_KEY=<chaîne de 44 caractères>
+```
+
+**Avertissement** : si cette clé est perdue ou modifiée, toutes les
+credentials chiffrées en base deviennent illisibles et la base doit être
+réinitialisée (`reset_db.ps1`). Ne jamais la committer dans git.
 
 ## Variables d'environnement
 
