@@ -213,3 +213,112 @@ atomiques avec des messages descriptifs.
 ### Conditions de révision
 Si un collègue rejoint le projet, ou si une feature risquée justifie 
 une isolation, on basculera vers un workflow de branches feature.
+
+---
+
+## D-010 — verify_magic_link sans transaction atomique [DETTE TECHNIQUE — RÉVISABLE]
+Date : 15 mai 2026
+
+### Décision
+La méthode `AuthService.verify_magic_link` effectue trois opérations
+séquentielles sans transaction englobante : (1) marquage du token comme
+utilisé (`used_at`), (2) upsert de l'utilisateur, (3) création de la
+session. Un crash entre les étapes laisserait la base dans un état
+partiellement cohérent.
+
+### Justification
+Sur SQLite en développement local, le risque est négligeable et la
+complexité d'une gestion transactionnelle explicite (savepoints, rollback
+partiel) n'est pas justifiée pour un POC solo. SQLAlchemy autorise les
+transactions explicites via `db.begin()` mais l'implémentation actuelle
+s'appuie sur l'autocommit implicite de chaque `db.commit()`.
+
+### Conséquences
+Si le serveur crashe entre l'étape 1 et l'étape 3, le token est marqué
+`used_at` mais aucune session n'est créée. L'utilisateur doit relancer
+une demande de magic link. Ce comportement est acceptable en POC.
+
+### Conditions de révision
+Avant tout déploiement en production ou migration vers PostgreSQL, wrapper
+les trois opérations dans une transaction unique :
+```python
+with self._db.begin():
+    token.used_at = ...
+    # upsert user
+    # create session
+```
+La méthode `create_or_update_user` devra ne plus appeler `db.commit()`
+pour que le commit soit délégué à la transaction parente.
+
+---
+
+## D-011 — Authentification utilisateur par magic link sans password [DÉFINITIVE]
+Date : 15 mai 2026
+
+### Décision
+PA-Explorer n'implémente pas de système d'authentification utilisateur 
+avec email plus password. À la place, le système utilise un magic link 
+envoyé après vérification que l'email est dans une allowlist et que 
+les credentials IBM PA fournis sont valides.
+
+### Justification
+IBM PA gère déjà l'authentification utilisateur via son propre système 
+de rôles et d'API keys. Recréer un système d'authentification dans 
+PA-Explorer ferait doublon et introduirait des problèmes de 
+synchronisation. Le magic link sert uniquement à identifier la session 
+PA-Explorer, en s'appuyant sur le fait que la personne a déjà été 
+authentifiée par IBM via la génération de son API key.
+
+L'allowlist permet de contrôler qui peut utiliser l'application sans 
+créer un système complet de gestion d'utilisateurs.
+
+### Conséquences
+Les credentials IBM PA sont stockées chiffrées en base, associées à 
+l'email de l'utilisateur. La validité de ces credentials est vérifiée 
+à chaque appel via la gestion existante des exceptions IBMPAAuthError.
+
+---
+
+## D-012 — Chiffrement Fernet des credentials utilisateur [DÉFINITIVE]
+Date : 15 mai 2026
+
+### Décision
+Les credentials IBM PA des utilisateurs sont chiffrées avec Fernet 
+(bibliothèque cryptography) avant stockage en base. La clé de 
+chiffrement PA_EXPLORER_ENCRYPTION_KEY est stockée dans .env.local.
+
+### Justification
+Stocker des api_keys en clair en base serait une mauvaise pratique de 
+sécurité, même pour un POC, parce que cela créerait une mauvaise 
+habitude. Fernet offre un chiffrement symétrique robuste avec rotation 
+de clé possible plus tard.
+
+### Conséquences
+La perte de PA_EXPLORER_ENCRYPTION_KEY rend toutes les credentials 
+chiffrées illisibles. La base doit alors être réinitialisée.
+
+### Conditions de révision
+En production, prévoir une stratégie de rotation de clé et de backup 
+sécurisé documentée. Investiguer aussi les solutions de gestion de 
+secrets comme HashiCorp Vault ou AWS Secrets Manager.
+
+---
+
+## D-013 — Allowlist d'emails pour le contrôle d'accès [DÉFINITIVE pour le POC]
+Date : 15 mai 2026
+
+### Décision
+Le contrôle d'accès à PA-Explorer se fait via une table 
+UserAllowlist qui liste les emails autorisés à demander un magic link. 
+Un email administrateur initial est pré-peuplé via la variable 
+PA_EXPLORER_INITIAL_ADMIN_EMAIL.
+
+### Justification
+Cette approche minimaliste permet de contrôler qui peut utiliser le 
+système sans créer un mécanisme complet de gestion de rôles. Elle est 
+extensible vers des rôles ou des permissions plus fins si nécessaire.
+
+### Conditions de révision
+Si PA-Explorer évolue vers un usage multi-tenants ou avec une vraie 
+gestion d'équipes, l'allowlist sera remplacée par un système de 
+permissions plus structuré.

@@ -180,4 +180,107 @@ Reste à déterminer s’il est nécessaire de nettoyer ce répertoire lors de l
 
 Je m'attends à ce que Claude Code consulte add_ibm_pa_endpoint.md sans qu'on lui demande, qu'il identifie correctement que l'URL contient deux variables server_name et cube_name à substituer, qu'il propose un modèle Dimension cohérent avec le pattern existant, et qu'il pose la question de l'URL encoding pour les noms de cubes avec espaces.
 
+## Session du 15 mai 2026 — Semaine 4, exécution des phases 1 et 2 du PRD magic link
+
+Cette session est la plus longue du parcours jusqu'ici. Elle couvre l'exécution 
+de deux phases d'un PRD complexe sur l'authentification utilisateur, qui est 
+aussi ma première vraie expérience de la méthode multi-phase plans.
+
+### Conception du PRD avec contraintes métier IBM PA
+
+La conception du PRD a fait apparaître plusieurs choix architecturaux 
+importants. Plutôt que de recréer une authentification email plus password 
+classique, j'ai choisi de m'appuyer sur le fait qu'IBM PA gère déjà ses 
+utilisateurs via son système de rôles et d'API keys. Mon authentification 
+PA-Explorer est donc volontairement légère : un magic link envoyé après 
+vérification de l'allowlist et validation des credentials IBM PA.
+
+Cette décision a été prise en dialogue avec mon assistant pédagogique 
+Claude AI, et documentée dans decisions.md comme D-011. Elle s'inscrit 
+dans une vision plus large de support multi-version V11 V12 documentée 
+dans docs/roadmap/multi_version_support.md.
+
+### Exécution de la phase 1, les fondations
+
+La phase 1 a couvert la création des trois modèles User, UserSession, 
+UserAllowlist plus le module de chiffrement Fernet et la fonction de 
+validation des credentials IBM PA. C'était une session principalement de 
+fondations sans endpoints exposés.
+
+Le piège principal rencontré cette fois est venu de mon environnement et 
+non de Claude Code. Le script reset_db.ps1 n'existait pas encore à la 
+racine et il a fallu faire une suppression manuelle. Plus subtil, j'ai 
+constaté que VS Code peut maintenir un verrou sur la base SQLite via 
+son extension SQLite Viewer, ce qui peut faire échouer silencieusement 
+les opérations de reset.
+
+J'ai aussi découvert que VS Code SQLite Viewer affiche une seule table à 
+la fois sans navigation visible vers les autres. J'ai dû créer un petit 
+script de diagnostic check_db.py que j'ai rangé dans un nouveau dossier 
+scripts à la racine pour vérifier l'état réel de la base. Ce dossier 
+accueillera mes futurs scripts utilitaires.
+
+### Exécution de la phase 2, les endpoints d'authentification
+
+La phase 2 a livré les deux endpoints POST /auth/request et GET /auth/verify 
+plus le quatrième modèle MagicLinkToken. C'est cette phase qui a rendu la 
+feature visible et testable dans Swagger pour la première fois.
+
+Trois pièges à retenir lors des tests Swagger. Le premier, les guillemets 
+dans le JSON Swagger doivent être uniquement les guillemets de syntaxe 
+JSON, pas des guillemets répétés dans les valeurs. J'avais collé mes 
+credentials avec leurs guillemets, ce qui transmettait des chaînes avec 
+guillemets à IBM PA. Le second, le copier-coller du token depuis l'URL 
+complète peut tronquer le début du token. Il faut copier le token brut 
+depuis la console uvicorn ou depuis la base. Le troisième, Swagger affiche 
+la section Responses avec les codes possibles selon la spec, ce qui peut 
+être confondu avec la réponse réelle qui est dans Server response.
+
+### Apprentissages méthodologiques
+
+Cette session m'a aussi appris que les PRDs en plusieurs phases sont un 
+outil très puissant pour découper le travail. Chaque phase est validable 
+indépendamment, ce qui permet de faire des pauses propres et de revenir 
+sur le travail sans perdre le fil.
+
+J'ai aussi consolidé deux nouveaux prompts dans prompts.md. Le P-005 sur 
+la fidélité stricte aux sources, et le P-006 sur la correction de bug 
+basée sur traceback. Ces deux prompts sont déjà réutilisables dans les 
+semaines à venir.
+
+### Pour la suite
+
+Phase 3 du PRD à venir, qui ajoutera le middleware de protection des 
+routes existantes. C'est cette phase qui va vraiment connecter 
+l'authentification au reste du projet, en imposant qu'on ne puisse 
+appeler les endpoints servers cubes dimensions qu'avec un cookie de 
+session valide.
+
 ## Session du 15 mai 2026 
+
+Compléter le route auth pour swagger
+
+```bash
+/api/v1/auth/request 
+```
+et mettre à jour les données sensibles
+
+```json
+{
+  "email": "user@example.com",
+  "ibm_pa_version": "V12",
+  "credentials_payload": {
+    "tenant_id": "ta-vraie-valeur-tenant",
+    "api_key": "ta-vraie-valeur-api-key"
+  }
+}
+```
+puis lancer le commande pour afficher le token :
+
+```python
+python -c "import sqlite3; conn = sqlite3.connect('pa_explorer.db'); cursor = conn.cursor(); cursor.execute('SELECT token FROM magic_link_tokens ORDER BY created_at DESC LIMIT 1'); print(cursor.fetchone()[0]); conn.close()"
+```
+
+- Premièrement, un utilisateur dont l'email est dans l'allowlist peut soumettre ses credentials IBM PA via POST /auth/request. Le système valide les credentials contre IBM PA, génère un magic link sécurisé, et logge ce lien dans la console uvicorn.
+- Deuxièmement, l'utilisateur peut utiliser le magic link via GET /auth/verify pour obtenir un cookie de session. Le système marque le token comme utilisé pour empêcher le rejeu, crée ou met à jour son enregistrement User, et établit une UserSession active pour 24 heures.
+

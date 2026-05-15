@@ -9,7 +9,8 @@ from app.models import dimension  # noqa: F401 — enregistre Dimension dans la 
 from app.models import user  # noqa: F401 — enregistre User dans la metadata SQLAlchemy
 from app.models import user_session  # noqa: F401 — enregistre UserSession dans la metadata SQLAlchemy
 from app.models import user_allowlist  # noqa: F401 — enregistre UserAllowlist dans la metadata SQLAlchemy
-from app.routers import health, servers, cubes, dimensions
+from app.models import magic_link_token  # noqa: F401 — enregistre MagicLinkToken dans la metadata SQLAlchemy
+from app.routers import health, servers, cubes, dimensions, auth
 
 
 def _seed_allowlist() -> None:
@@ -44,3 +45,4 @@ app.include_router(health.router, prefix="/api/v1")
 app.include_router(servers.router, prefix="/api/v1")
 app.include_router(cubes.router, prefix="/api/v1")
 app.include_router(dimensions.router, prefix="/api/v1")
+app.include_router(auth.router, prefix="/api/v1")

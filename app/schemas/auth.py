@@ -1,10 +1,17 @@
 from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
-# TODO Phase 2 : remplacer str par EmailStr (ajouter email-validator aux dépendances)
 class AuthRequest(BaseModel):
-    email: str
+    email: EmailStr
     ibm_pa_version: str = "V12"
     credentials_payload: dict[str, Any]
+
+
+class AuthRequestResponse(BaseModel):
+    message: str
+
+
+class AuthVerifyResponse(BaseModel):
+    message: str

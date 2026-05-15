@@ -5,6 +5,7 @@ python-dotenv==1.1.0
 sqlalchemy==2.0.40
 httpx==0.28.1
 cryptography>=42.0.0
+email-validator>=2.0
 
 # Dev / test
 pytest==8.3.5

@@ -56,7 +56,7 @@ docs/learning/README.md.
 
 [À METTRE À JOUR À LA FIN DE CHAQUE SEMAINE]
 
-État actuel : Semaine 2 terminée le 28 avril 2026.
+État actuel : Semaine 4 phase 2 terminée le 15 mai 2026.
 
 Semaine 1 accomplie. Mise en place du projet, premier endpoint health, 
 configuration de base SQLite, gestion des credentials par env files.
@@ -66,18 +66,30 @@ authentification IBM PA SaaS via apikey, client httpx, pattern cache
 aside avec TTL configurable, gestion d'erreurs en sept types d'exceptions 
 métier, exposition de routes GET et POST avec Swagger.
 
-Semaine 3 accomplie. Création du CLAUDE.md consolidé en français à 
-la racine du projet pour le steering automatique de Claude Code. 
-Création du skill add_ibm_pa_endpoint.md dans docs/skills qui 
-formalise la procédure d'ajout d'un endpoint IBM PA. Application 
-concrète sur list_cubes qui expose maintenant la liste des cubes 
-TM1 par serveur. Découverte de la richesse réelle des cubes IBM PA 
-avec règles de calcul, feeders et attributs. Découverte d'un piège 
-Python sur str.format qui ne fait pas de format partiel, contourné 
-par généralisation de la méthode _url du client. Test de validation 
-du steering effectué sur list_dimensions, qui a confirmé que Claude 
-Code consulte bien les fichiers de référence et applique les patterns 
-documentés.
+Semaine 3 accomplie. Création du CLAUDE.md consolidé en français à la 
+racine pour le steering automatique. Création du skill 
+add_ibm_pa_endpoint.md qui formalise la procédure d'ajout d'un endpoint 
+IBM PA. Application sur list_cubes et list_dimensions qui exposent la 
+hiérarchie serveur cube dimension. Découverte du piège str.format en 
+Python. Test de validation du steering réussi.
+
+Semaine 4 en cours. Travail sur la planification de tâches complexes 
+via PRDs et multi-phase plans. Application sur l'authentification 
+utilisateur par magic link adapté au contexte IBM PA. Document de 
+roadmap multi_version_support.md créé pour anticiper le support futur 
+V11 V12. Phase 1 du PRD terminée avec les modèles User UserSession 
+UserAllowlist plus le chiffrement Fernet. Phase 2 du PRD terminée 
+avec les endpoints POST /auth/request et GET /auth/verify, le modèle 
+MagicLinkToken, et le mécanisme de magic link à usage unique avec 
+expiration 15 minutes et session 24 heures.
+
+Phase 3 du PRD à venir. Implémentation du middleware qui protège les 
+routes existantes en exigeant un cookie de session valide.
+
+Semaine 5 à venir. Feedback loops, tests pytest avec mocks IBMPAClient, 
+pre-commit hooks, Red-Green Refactor, installation Alembic pour 
+migrations. Migration de l'envoi du magic link vers email réel via 
+Mailtrap au début de la semaine.
 
 ## Mode de travail établi entre nous
 
