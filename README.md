@@ -40,6 +40,45 @@ uvicorn app.main:app --reload
 L'API est disponible sur `http://localhost:8000`.  
 La documentation interactive Swagger est accessible sur `http://localhost:8000/docs`.
 
+## Tester les endpoints d'authentification
+
+### POST /auth/request — Demander un magic link
+
+1. Ouvre Swagger : http://localhost:8000/docs
+2. Trouve l'endpoint POST /api/v1/auth/request
+3. Remplis le Request body avec tes vraies valeurs :
+
+```json
+{
+  "email": "smalho@aexis.com",
+  "ibm_pa_version": "V12",
+  "credentials_payload": {
+    "tenant_id": "ta-valeur-depuis-.env.local",
+    "api_key": "ta-valeur-depuis-.env.local"
+  }
+}
+```
+
+4. Clique Execute. Tu dois obtenir un 200 avec un message générique.
+5. Regarde la console uvicorn pour voir le magic link loggé :
+
+INFO: Magic link emis pour smalho@aexis.com : http://localhost:8000/api/v1/auth/verify?token=...
+
+### GET /auth/verify — Utiliser le magic link
+
+1. Copie le token complet en lançant le script utilitaire :
+
+```powershell
+python scripts/get_magic_link_token.py
+```
+
+Cela affiche le token récent, son email et l'URL complète de vérification.
+
+2. Va à http://localhost:8000/api/v1/auth/verify?token=COLLE_TON_TOKEN_ICI
+   Ou utilise Swagger avec GET /api/v1/auth/verify en passant le token en query param.
+
+3. Tu dois obtenir un 200 "Session créée. Vous êtes authentifié." et un cookie session_token posé.
+
 ## Procédures de développement
 
 ### Premier démarrage
@@ -54,9 +93,9 @@ La documentation interactive Swagger est accessible sur `http://localhost:8000/d
 Pour vérifier rapidement l'état de la base SQLite, exécuter le script 
 de diagnostic.
 
-\`\`\`powershell
+```powershell
 python scripts/check_db.py
-\`\`\`
+```
 
 Le script liste toutes les tables présentes et le nombre de lignes 
 par table. Il affiche aussi le contenu des tables de référence comme 
@@ -114,7 +153,13 @@ réinitialisée (`reset_db.ps1`). Ne jamais la committer dans git.
 
 | Méthode | Route | Description |
 |---|---|---|
-| `GET` | `/api/v1/health` | Statut du service et de la base de données |
+| `GET` | `/api/v1/health` | Statut du service et de la base |
+| `GET` | `/api/v1/servers` | Liste des serveurs TM1 |
+| `POST` | `/api/v1/servers/refresh` | Force le rafraîchissement |
+| `GET` | `/api/v1/servers/{name}/cubes` | Liste des cubes d'un serveur |
+| `GET` | `/api/v1/servers/{name}/cubes/{cube}/dimensions` | Liste des dimensions |
+| `POST` | `/api/v1/auth/request` | Demander un magic link |
+| `GET` | `/api/v1/auth/verify` | Vérifier le magic link |
 
 ## Structure du projet
 
