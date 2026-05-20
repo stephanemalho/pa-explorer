@@ -1,3 +1,4 @@
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -29,6 +30,13 @@ class Settings(BaseSettings):
     pa_explorer_initial_admin_email: str
     auth_session_ttl_hours: int = 24
     auth_magic_link_ttl_minutes: int = 15
+
+    @field_validator("debug", mode="before")
+    @classmethod
+    def _parse_debug(cls, value):
+        if isinstance(value, str) and value.strip().lower() == "release":
+            return False
+        return value
 
 
 settings = Settings()

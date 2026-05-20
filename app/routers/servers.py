@@ -18,6 +18,7 @@ from app.config import settings
 from app.database import get_db
 from app.models.server import Server
 from app.schemas.server import ServerResponse, ServersListResponse
+from app.security.dependencies import get_ibm_pa_client_for_user
 from app.services.server_service import ServerService
 
 logger = logging.getLogger(__name__)
@@ -25,17 +26,9 @@ logger = logging.getLogger(__name__)
 router = APIRouter(tags=["servers"])
 
 
-def get_ibm_pa_client() -> IBMPAClient:
-    return IBMPAClient(
-        base_url=settings.ibm_pa_base_url,
-        tenant_id=settings.ibm_pa_tenant_id,
-        api_key=settings.ibm_pa_api_key,
-    )
-
-
 def get_server_service(
     db: Session = Depends(get_db),
-    client: IBMPAClient = Depends(get_ibm_pa_client),
+    client: IBMPAClient = Depends(get_ibm_pa_client_for_user),
 ) -> ServerService:
     return ServerService(db=db, client=client)
 
