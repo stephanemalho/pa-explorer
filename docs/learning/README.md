@@ -9,7 +9,7 @@ Quand je reviens sur le projet après une pause, c'est ici que je commence.
 
 ## Structure des fichiers
 
-### journal.md
+### journal-perso/journal.md
 Chronologie temporelle des sessions de travail. Chaque entrée datée 
 contient ce qui a été accompli, les difficultés rencontrées, les surprises, 
 et les leçons retenues. À lire pour se replacer dans le contexte du projet 

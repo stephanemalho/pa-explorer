@@ -1,0 +1,21 @@
+# Journal de bord — PA-Explorer
+
+Chronologie des sessions de travail, organisée par semaine du parcours d'apprentissage.
+
+## Semaines
+
+- [Semaine 1 — Prise en main de Claude Code](semaine-1.md)
+  Fondations du projet FastAPI, premier endpoint health, découverte de l'écosystème Python
+  depuis un profil JavaScript, rétrospective de fin de semaine.
+
+- [Semaine 2 — Fondamentaux de Claude Code](semaine-2.md)
+  Première feature métier avec Plan Mode : listing des serveurs IBM PA, client httpx,
+  cache aside TTL, débogage datetime SQLite, pattern client/service/router établi.
+
+- [Semaine 3 — Steering avec CLAUDE.md](semaine-3.md)
+  Création du CLAUDE.md, extension de l'API avec cubes et dimensions, découverte de
+  /compact et de l'historique des sessions, premiers skills personnalisés.
+
+- [Semaine 4 — Planification de tâches complexes](semaine-4.md)
+  PRD magic link en trois phases : authentification multi-utilisateur, chiffrement Fernet,
+  session cookie, middleware de protection des routes. Première feature multi-session.
