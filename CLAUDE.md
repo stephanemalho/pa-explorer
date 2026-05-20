@@ -40,4 +40,7 @@ Plan Mode pour les features architecturales. Mode direct pour les
 corrections circonscrites. Conventional commits : `type(scope): description`.
 
 Pour ajouter un endpoint IBM PA, consulter systématiquement le skill 
-`docs/skills/add_ibm_pa_endpoint.md` avant de proposer un plan.
+- **Ajouter un nouvel endpoint IBM PA** → `docs/skills/add_ibm_pa_endpoint.md`
+ avant de proposer un plan.
+- Avant de signaler la complétion d'une tâche qui modifie du code applicatif, 
+consulter et appliquer `docs/skills/do_work.md`.
