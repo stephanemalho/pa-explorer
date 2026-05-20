@@ -66,19 +66,19 @@ d'une feature avec Plan Mode, boucle Plan-Execute-Clear. Première feature
 métier réelle de listing des serveurs TM1 avec authentification IBM PA, 
 client httpx, pattern cache aside, gestion d'erreurs structurée.
 
-### Semaine 3 — Steering avec Agents.md [EN COURS]
+### Semaine 3 — Steering avec Agents.md [TERMINÉE]
 Création d'un fichier Agents.md ou CLAUDE.md qui devient le manuel 
 d'utilisation de Claude Code sur ce projet. Principe de divulgation 
 progressive de l'information. Découverte des skills et écriture du 
 premier skill personnalisé. Configuration de la mémoire automatique.
 
-### Semaine 4 — Planification de tâches complexes [À VENIR]
+### Semaine 4 — Planification de tâches complexes [TERMINÉE]
 Comment attaquer des features massives sans se perdre. Écriture de PRDs 
 exécutables par Claude Code. Découpage de features sur plusieurs fenêtres 
 de contexte avec multi-phase plans. Pattern des tracer bullets pour 
 valider une architecture avant l'investissement complet.
 
-### Semaine 5 — Feedback Loops [À VENIR]
+### Semaine 5 — Feedback Loops [EN_COURS]
 La question fondamentale "le code est-il bon marché ?" et son impact 
 sur la philosophie de prototypage. Construction d'un skill "Do Work" 
 qui enseigne à Claude comment livrer proprement. Pre-commit hooks pour 
