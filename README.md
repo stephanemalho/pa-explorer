@@ -15,7 +15,11 @@ git clone <repo-url>
 cd pa-explorer
 
 # 2. Créer et activer un environnement virtuel
-python -m venv .venv
+python3.12 -m venv venv (recommended version)
+python -m venv .venv 
+or
+python3 -m venv venv 
+
 source .venv/bin/activate        # Linux/macOS
 .\venv\Scripts\activate  
 
