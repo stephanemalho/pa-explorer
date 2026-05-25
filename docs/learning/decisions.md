@@ -322,3 +322,37 @@ extensible vers des rôles ou des permissions plus fins si nécessaire.
 Si PA-Explorer évolue vers un usage multi-tenants ou avec une vraie 
 gestion d'équipes, l'allowlist sera remplacée par un système de 
 permissions plus structuré.
+
+## D-014 — Instanciation directe d'IBMPAClient dans validate_ibm_pa_credentials [EXCEPTION RECONNUE]
+Date : 23 mai 2026
+
+### Décision
+La méthode statique validate_ibm_pa_credentials dans 
+app/services/auth_service.py instancie directement un IBMPAClient avec 
+les credentials passées en paramètres, sans utiliser Depends. C'est une 
+violation apparente de la convention C-1 du skill do_work, mais elle 
+est acceptée comme exception justifiée.
+
+### Justification
+La méthode est appelée pendant le flow POST /auth/request, avant que 
+l'utilisateur ne soit authentifié et avant qu'une session existe. Les 
+credentials sont fournies dans la requête HTTP. À ce stade, il n'y a 
+pas encore d'utilisateur à qui rattacher un client via Depends. Le 
+client est créé spécifiquement pour valider ces credentials et n'est 
+pas réutilisé après.
+
+L'alternative serait de faire que le router POST /auth/request 
+instancie le client et le passe en paramètre à 
+validate_ibm_pa_credentials. Cela serait plus cohérent architecturalement 
+mais introduirait une complexité supplémentaire dans le router pour un 
+gain marginal.
+
+### Conséquences
+Le skill do_work continuera de signaler cette ligne lors de l'audit 
+architectural via grep. C'est attendu et acceptable. Le signal sert 
+de rappel que cette exception existe.
+
+### Conditions de révision
+Si d'autres cas similaires émergent où un client doit être créé hors 
+contexte d'authentification, revoir la stratégie pour éventuellement 
+introduire une factory pattern ou une dépendance contextuelle.
