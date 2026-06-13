@@ -19,3 +19,7 @@ Chronologie des sessions de travail, organisée par semaine du parcours d'appren
 - [Semaine 4 — Planification de tâches complexes](semaine-4.md)
   PRD magic link en trois phases : authentification multi-utilisateur, chiffrement Fernet,
   session cookie, middleware de protection des routes. Première feature multi-session.
+
+- [Semaine 5 — Feedback Loops](semaine-5.md)
+  Mise en place progressive d'une vraie boucle pytest : configuration pytest, fixtures
+  partagées par domaine, SQLite isolé par test, et préparation des tests auth/API/client.

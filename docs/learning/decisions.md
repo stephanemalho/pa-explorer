@@ -356,3 +356,37 @@ de rappel que cette exception existe.
 Si d'autres cas similaires émergent où un client doit être créé hors 
 contexte d'authentification, revoir la stratégie pour éventuellement 
 introduire une factory pattern ou une dépendance contextuelle.
+
+---
+
+## D-015 — Fixtures pytest séparées par domaine [DÉFINITIVE]
+Date : 13 juin 2026
+
+### Décision
+L'infrastructure de tests pytest est organisée avec un `conftest.py`
+minimal et des modules de fixtures spécialisés sous `tests/fixtures/`.
+`conftest.py` prépare les variables d'environnement avant les imports
+applicatifs puis charge les fixtures via `pytest_plugins`.
+
+Les fixtures de base de données et de client FastAPI vivent dans
+`tests/fixtures/database.py`. Les factories liées à l'authentification
+vivent dans `tests/fixtures/auth.py`.
+
+### Justification
+Le premier jet centralisait toutes les fixtures dans `conftest.py`, ce
+qui rendait le fichier trop volumineux et mélangeait plusieurs
+responsabilités. La séparation par domaine rend l'infrastructure plus
+lisible, plus DRY, et plus facile à étendre pendant la semaine 5.
+
+La DB de test utilise SQLite en mémoire avec `StaticPool` afin que le
+`TestClient` FastAPI et la session SQLAlchemy du test partagent la même
+base isolée. Chaque test recrée ses tables et nettoie les dependency
+overrides FastAPI après exécution.
+
+### Conséquences
+Les nouveaux tests doivent réutiliser les fixtures existantes plutôt que
+recréer manuellement une session SQLAlchemy, un utilisateur, une session
+ou un magic link dans chaque fichier.
+
+Si une nouvelle famille de fixtures grossit, créer un module dédié sous
+`tests/fixtures/` plutôt que d'allonger `conftest.py`.

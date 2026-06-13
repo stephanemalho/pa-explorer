@@ -85,7 +85,11 @@ qui enseigne à Claude comment livrer proprement. Pre-commit hooks pour
 empêcher du code mal formaté. Application du Red-Green Refactor sur 
 PA-Explorer. Mise en place d'une suite de tests pytest robuste avec 
 mocks de l'API IBM PA. Migration vers Alembic pour la gestion du schéma 
-de base de données.
+de base de données. Premiers livrables réalisés : tests des services
+cache `ServerService`, `CubeService`, `DimensionService` avec fake IBM PA,
+puis infrastructure pytest partagée avec fixtures séparées par domaine,
+DB SQLite isolée par test, et `TestClient` FastAPI branché sur `get_db`
+de test.
 
 ### Semaine 6 — Pattern Ralph et tâches autonomes [À VENIR]
 Découverte du pattern Ralph d'orchestration autonome où l'agent travaille 

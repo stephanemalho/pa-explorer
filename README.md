@@ -89,6 +89,16 @@ Cela affiche le token récent, son email et l'URL complète de vérification
 
 ## Procédures de développement
 
+### Lancer les tests automatisés
+
+Les tests pytest utilisent une base SQLite en mémoire isolée par test.
+Les fixtures communes sont séparées par domaine sous `tests/fixtures/`
+et chargées par `tests/conftest.py`.
+
+```bash
+venv/bin/python -m pytest -q
+```
+
 ### Premier démarrage
 
 1. Activer le venv : `.\venv\Scripts\activate` (PowerShell)
