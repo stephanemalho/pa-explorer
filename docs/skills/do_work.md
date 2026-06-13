@@ -11,12 +11,14 @@ les tests métier — il en est le prérequis.
 
 Appliquer ce skill systématiquement dans les cas suivants.
 
-**Toujours appliquer** :
+**Toujours appliquer**:
+
 - À la fin de toute tâche qui modifie un ou plusieurs fichiers sous `app/`
 - Après tout ajout ou modification d'une dépendance dans `requirements.txt`
 - Avant tout commit git
 
-**Ne pas appliquer** :
+**Ne pas appliquer**:
+
 - Pour les tâches purement documentaires qui ne modifient que des
   fichiers sous `docs/` ou `README.md`
 - Pour les modifications de fichiers de configuration non applicatifs
@@ -34,6 +36,7 @@ Si l'une d'elles échoue, la tâche n'est pas considérée comme terminée.
 **Source** : CLAUDE.md ("Pattern obligatoire").
 
 Vérifier que :
+
 - Aucun router ne contient de logique métier (calculs, requêtes SQL,
   décisions de cache)
 - Aucun router ni aucun service n'importe ou n'instancie `httpx`
@@ -42,6 +45,7 @@ Vérifier que :
   instanciation directe dans le corps d'un handler
 
 Commandes de vérification :
+
 ```powershell
 grep -r "import httpx" app/routers/ app/services/
 grep -r "IBMPAClient(" app/routers/ app/services/
@@ -63,6 +67,7 @@ lève une `TypeError`.
 
 Vérifier que chaque lecture d'un champ datetime en base est suivie du
 pattern de normalisation :
+
 ```python
 if dt.tzinfo is None:
     dt = dt.replace(tzinfo=timezone.utc)
@@ -82,6 +87,7 @@ La stack est synchrone par décision architecturale définitive. Un
 comportements indéterminés avec SQLAlchemy synchrone.
 
 Commande de vérification :
+
 ```powershell
 grep -r "async def" app/routers/ app/services/ app/clients/
 ```
@@ -133,6 +139,7 @@ httpx.BasicAuth(user_email, api_key)  # faux — AuthorizedConnectionFailed
 ajout dans `requirements.txt` sans relancer `pip install`).
 
 Après toute modification de `requirements.txt`, exécuter :
+
 ```powershell
 pip install -r requirements.txt
 ```
@@ -207,6 +214,7 @@ from app.models import mon_entite  # noqa: F401 — enregistre MonEntite dans la
 
 Vérifier que `SettingsConfigDict` dans `app/config.py` déclare bien
 les deux fichiers :
+
 ```python
 model_config = SettingsConfigDict(
     env_file=(".env", ".env.local"),
@@ -310,19 +318,22 @@ Résultat attendu : `Application startup complete` sans traceback.
 Les commandes suivantes seront ajoutées à cette procédure une fois
 les outils installés et configurés.
 
-**Formatage automatique — black ou ruff format :**
+**Formatage automatique — black ou ruff format :**:
+
 ```powershell
 # À partir de la semaine 5, après pip install ruff
 ruff format app/
 ```
 
 **Linting — ruff check :**
+
 ```powershell
 # À partir de la semaine 5, après pip install ruff
 ruff check app/
 ```
 
 **Type checking — mypy :**
+
 ```powershell
 # À partir de la semaine 5 ou 6, après pip install mypy
 python -m mypy app/

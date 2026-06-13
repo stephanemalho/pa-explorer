@@ -7,6 +7,13 @@ API REST Python/FastAPI pour interagir avec IBM Planning Analytics SaaS.
 - Python 3.11+
 - pip
 
+test:
+
+```bash
+   python --version 
+   # exemple : Python 3.12.13 
+```
+
 ## Installation
 
 ```bash
@@ -61,8 +68,7 @@ La documentation interactive Swagger est accessible sur `http://localhost:8000/d
     "api_key": "ta-valeur-depuis-.env.local"
   }
 }
-```
-
+```.
 4. Clique Execute. Tu dois obtenir un 200 avec un message générique.
 5. Regarde la console uvicorn pour voir le magic link loggé :
 
@@ -76,16 +82,15 @@ INFO: Magic link emis pour smalho@aexis.com : http://localhost:8000/api/v1/auth/
 python scripts/get_magic_link_token.py
 ```
 
-Cela affiche le token récent, son email et l'URL complète de vérification.
-
+Cela affiche le token récent, son email et l'URL complète de vérification
 2. Va à http://localhost:8000/api/v1/auth/verify?token=COLLE_TON_TOKEN_ICI
    Ou utilise Swagger avec GET /api/v1/auth/verify en passant le token en query param.
-
 3. Tu dois obtenir un 200 "Session créée. Vous êtes authentifié." et un cookie session_token posé.
 
 ## Procédures de développement
 
 ### Premier démarrage
+
 1. Activer le venv : `.\venv\Scripts\activate` (PowerShell)
 2. Installer les dépendances : `pip install -r requirements.txt`
 3. Copier `.env.example` vers `.env.local` et renseigner les valeurs
@@ -106,13 +111,16 @@ par table. Il affiche aussi le contenu des tables de référence comme
 user_allowlist.
 
 ### Réinitialiser la base après modification d'un modèle
+
 1. Arrêter uvicorn avec Ctrl+C
 2. Fermer l'onglet pa_explorer.db dans VS Code (s'il est ouvert)
 3. Supprimer la base : `del pa_explorer.db`
 4. Relancer le serveur : `python -m uvicorn app.main:app --reload`
 
 ### En cas de fichier verrouillé
-Si la suppression échoue avec un message "fichier en cours d'utilisation" :
+
+Si la suppression échoue avec un message "fichier en cours d'utilisation":
+
 1. Lister les processus Python : `Get-Process | Where-Object {$_.ProcessName -like "*python*"}`
 2. Tuer les instances : `Get-Process python3.12 | Stop-Process -Force`
 3. Réessayer la suppression
@@ -131,7 +139,7 @@ python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().d
 
 La commande affiche une chaîne de 44 caractères. L'ajouter dans `.env.local` :
 
-```
+```bash
 PA_EXPLORER_ENCRYPTION_KEY=<chaîne de 44 caractères>
 ```
 
@@ -150,13 +158,19 @@ réinitialisée (`reset_db.ps1`). Ne jamais la committer dans git.
 | `IBM_PA_BASE_URL` | URL de base IBM PA SaaS | `https://eu-central-1.planninganalytics.saas.ibm.com` |
 | `IBM_PA_TENANT_ID` | Identifiant du tenant IBM PA | `your-tenant-id` |
 | `IBM_PA_API_KEY` | Clé API IBM PA | `your-api-key` |
+| `IBM_PA_SERVERS_TTL_SECONDS` | DELAY | 300 |
+| `IBM_PA_CUBES_TTL_SECONDS` | DELAY | 300 |
+| `IBM_PA_DIMENSIONS_TTL_SECONDS` | DELAY | 300 |
 | `PA_EXPLORER_ENCRYPTION_KEY` | Clé Fernet 44 chars pour chiffrer les credentials utilisateur | Générer via `Fernet.generate_key()` |
 | `PA_EXPLORER_INITIAL_ADMIN_EMAIL` | Email pré-autorisé dans UserAllowlist au démarrage | `admin@example.com` |
+| `PA_EXPLORER_INITIAL_ADMIN_EMAIL` | EMAIl | `example@mail.com` |
+| `AUTH_SESSION_TTL_HOURS` | DELAY | 24 |
+| `AUTH_MAGIC_LINK_TTL_MINUTES` | DELAY | 15 |
 
 ## Endpoints
 
 | Méthode | Route | Description |
-|---|---|---|
+| --- | --- | --- |
 | `GET` | `/api/v1/health` | Statut du service et de la base |
 | `GET` | `/api/v1/servers` | Liste des serveurs TM1 |
 | `POST` | `/api/v1/servers/refresh` | Force le rafraîchissement |
@@ -167,7 +181,7 @@ réinitialisée (`reset_db.ps1`). Ne jamais la committer dans git.
 
 ## Structure du projet
 
-```
+```bash
 pa-explorer/
 ├── app/
 │   ├── main.py          # Point d'entrée FastAPI

@@ -33,7 +33,7 @@ Avant toute écriture de code, consulter la documentation IBM Planning
 Analytics REST API pour identifier le pattern d'URL exact de l'entité 
 demandée. Pour les déploiements SaaS, la structure générale est :
 
-```
+```BASH
 GET /api/{tenant_id}/v0/tm1/{contexte}/{Entité}
 ```
 
