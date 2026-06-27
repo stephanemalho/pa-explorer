@@ -1,192 +1,178 @@
-# Semaine 5 — Feedback Loops
+# Semaine 5 — Feedback Loops et tests
 
-La semaine 5 démarre par la consolidation de la boucle de tests. L'objectif
-n'est pas seulement d'ajouter des assertions, mais de rendre le feedback plus
-rapide, plus fiable, et plus facile à maintenir pendant que PA-Explorer grandit.
+La semaine 5 marque un changement de nature dans le parcours. Les semaines 
+précédentes ajoutaient des fonctionnalités visibles. La semaine 5 construit 
+l'infrastructure de qualité qui rend le code fiable et permet à Claude Code 
+de travailler avec plus d'autonomie. C'est une semaine de qualité plutôt que 
+de fonctionnalité, mais elle est fondamentale pour tout ce qui suit.
 
-Cette semaine commence aussi avec une règle de collaboration explicite : on
-avance par petits lots vérifiables, le développeur humain garde la main sur
-les commits et les pushs, et l'assistant s'arrête après chaque étape pour
-permettre la revue.
-
----
-
-## Session du 13 juin 2026 — Préparation documentaire et skill do_work
-
-Premier travail de la journée : remise en ordre documentaire avant d'attaquer
-les tests.
-
-Commit concerné :
-
-```text
-3e9110d docs(md): update markdown structure
-```
-
-Ce commit a ajouté `ONBOARDING.md`, enrichi le README racine, et ajusté les
-skills `docs/skills/do_work.md` et `docs/skills/add_ibm_pa_endpoint.md`.
-
-Le point le plus important pour la semaine 5 est le skill `do_work`, qui
-formalise les vérifications de qualité avant de considérer une tâche comme
-terminée :
-
-- respect du pattern strict `client → service → router`
-- absence d'appel HTTP hors des clients
-- vigilance sur les datetimes SQLite sans timezone
-- tests pytest comme vérification bloquante
-- smoke test uvicorn recommandé quand l'environnement le permet
-
-Cette étape pose le cadre méthodologique : le code peut évoluer vite, mais la
-livraison doit rester vérifiée.
+L'apprentissage central de la semaine est double. D'une part la philosophie 
+des feedback loops, c'est-à-dire les mécanismes qui disent rapidement si le 
+code fonctionne. D'autre part la maîtrise pratique des tests pytest avec trois 
+techniques de mock distinctes.
 
 ---
 
-## Session du 13 juin 2026 — Tests ServerService avec fake IBM PA
+## La philosophie des feedback loops
 
-Premier ajout réel de tests métier sur la couche service.
+La question fondatrice de la semaine est "le code est-il bon marché ?". Si 
+Claude Code produit du code rapidement et à faible coût, alors la ressource 
+rare n'est plus le code mais le temps humain de validation. Les feedback loops 
+automatisent cette validation pour libérer ce temps.
 
-Commit concerné :
-
-```text
-65bd78d feat(tests): add ServerService cache logic tests with fake IBM PA client
-```
-
-Ce commit a créé `tests/fakes.py` avec un `FakeIBMPAClient` minimal et un jeu
-de serveurs IBM PA factices. Il a aussi ajouté `tests/test_server_service.py`.
-
-Les comportements couverts :
-
-- cache miss : le service appelle le client IBM PA et peuple la base
-- cache hit : le second appel réutilise le cache sans rappeler IBM PA
-- cache expiré : le service rappelle IBM PA
-- `force_refresh=True` : le cache est explicitement ignoré
-- erreur d'authentification IBM PA : l'exception remonte au caller
-
-Apprentissage important : le fake client compte les appels, ce qui permet de
-tester le comportement de cache sans réseau réel et sans dépendre d'IBM PA.
+Trois feedback loops structurent un projet Python. Les tests automatisés via 
+pytest qui disent en quelques secondes si le code est cassé. Le formatage et 
+le linting automatiques qui maintiennent la cohérence. Les pre-commit hooks 
+qui bloquent le commit de code défaillant. Cette semaine a posé le premier 
+de ces trois piliers, les tests, et préparé le terrain pour les deux autres.
 
 ---
 
-## Session du 13 juin 2026 — Tests CubeService et DimensionService
+## Le skill do_work, première brique de la semaine
 
-Deuxième ajout de tests métier, en appliquant le même pattern aux couches
-cubes et dimensions.
+Avant d'écrire le moindre test, j'ai créé un skill de qualité transversal, 
+do_work, dans docs/skills/do_work.md. Ce skill formalise les vérifications à 
+effectuer avant de signaler la complétion d'une tâche.
 
-Commit concerné :
+La conception de ce skill a suivi une démarche structurée. J'ai d'abord demandé 
+à Claude Code une analyse préparatoire qui recensait les pièges récurrents du 
+parcours, les conventions strictes du projet, et les actions mécaniques 
+automatisables. À partir de cette matière, le skill a été rédigé avec une 
+distinction clé entre vérifications bloquantes et vérifications indicatives.
 
-```text
-69e733a feat(tests): add CubeService and DimensionServices cache logic tests with fake IBM PA client
-```
+Les sept vérifications bloquantes couvrent le pattern client service router, 
+la normalisation UTC des datetimes, l'absence d'async def, la cohérence modèle 
+schéma réponse, l'authentification IBM PA, l'installation des dépendances, et 
+le passage des tests. Les six vérifications indicatives couvrent des points 
+recommandés mais non bloquants.
 
-Ce commit a étendu `tests/fakes.py` avec `FAKE_CUBES`, `FAKE_DIMENSIONS`, et
-les méthodes `get_cubes` / `get_dimensions` du fake client. Il a ajouté
-`tests/test_cube_service.py` et `tests/test_dimension_service.py`.
+Le skill a fait ses preuves dès sa première application réelle. Il a détecté 
+une violation architecturale pré-existante dans auth_service.py, l'instanciation 
+directe d'IBMPAClient dans validate_ibm_pa_credentials. Cette détection a donné 
+lieu à la décision D-014 qui documente cette instanciation comme une exception 
+reconnue, justifiée par le contexte de pré-authentification.
 
-Les comportements couverts pour les cubes :
-
-- cache miss
-- cache hit
-- cache expiré
-- `force_refresh=True`
-- propagation d'erreur IBM PA
-- transmission correcte du `server_name` au client IBM PA
-
-Les comportements couverts pour les dimensions :
-
-- cache miss
-- cache hit
-- cache expiré
-- `force_refresh=True`
-- propagation d'erreur IBM PA
-- transmission correcte du couple `server_name` / `cube_name` au client IBM PA
-
-Cette session confirme que les services restent testables parce qu'ils
-reçoivent leur client IBM PA par injection au constructeur. Le pattern
-architectural décidé les semaines précédentes commence à payer.
+Apprentissage important sur le skill. Un bon skill de qualité ne traite pas 
+tout au même niveau. La distinction bloquant versus indicatif évite que Claude 
+Code soit ralenti par des vérifications mineures tout en garantissant que les 
+points critiques sont toujours respectés.
 
 ---
 
-## Session du 13 juin 2026 — Infrastructure pytest partagée
+## L'infrastructure pytest et les premiers tests
 
-Troisième étape : consolider l'infrastructure de tests avant d'ajouter les
-tests d'authentification et d'API.
+La mise en place de pytest a commencé par les tests les plus simples pour 
+valider l'outillage. Les tests de l'endpoint health, sans aucune dépendance 
+externe, et les tests du module de chiffrement Fernet, purs et sans dépendance.
 
-Commit concerné :
+Le test de non-déterminisme du chiffrement mérite une mention. Il vérifie que 
+chiffrer la même chaîne deux fois donne deux résultats différents, grâce au 
+nonce aléatoire de Fernet. C'est un test qui valide une vraie propriété de 
+sécurité, pas juste un fonctionnement basique. Si le chiffrement était 
+déterministe, un attaquant ayant accès à la base pourrait déduire que deux 
+utilisateurs ont les mêmes credentials.
 
-```text
-03fc4df test(pytest): organize shared fixtures by domain
-```
-
-Cette étape n'ajoute pas de nouveaux tests métier. Elle prépare le terrain
-pour éviter de dupliquer la création de DB, de client FastAPI, d'utilisateur,
-de session et de magic link dans chaque futur fichier de test.
-
-Les changements importants :
-
-- `pytest.ini` fixe `testpaths = tests` et configure explicitement
-  `asyncio_default_fixture_loop_scope = function`.
-- `tests/conftest.py` reste le point d'entrée pytest, mais ne contient plus
-  toutes les fixtures. Il prépare les variables d'environnement nécessaires
-  avant les imports applicatifs, puis charge les modules de fixtures via
-  `pytest_plugins`.
-- `tests/fixtures/database.py` contient les fixtures liées à la base de test :
-  engine SQLite en mémoire, session SQLAlchemy isolée par test, `TestClient`
-  FastAPI et override propre de `get_db`.
-- `tests/fixtures/auth.py` contient les factories pour les futurs tests
-  d'authentification : allowlist, utilisateur, session utilisateur et magic
-  link token.
-
-Cette découpe a été choisie après revue du premier jet, où `conftest.py`
-devenait trop volumineux. La règle retenue est que `conftest.py` amorce
-pytest, tandis que les dépendances de test vivent dans des modules spécialisés
-par domaine.
-
-La commande de validation utilisée est :
-
-```bash
-venv/bin/python -m pytest -q
-```
-
-Résultat observé après cette étape : `27 passed`, sans warning
-`pytest-asyncio`.
+Un piège technique a été résolu lors de la mise en place. Les singletons 
+settings et _fernet sont créés à l'import des modules applicatifs. Le conftest 
+positionne donc des variables d'environnement de repli via os.environ.setdefault 
+avant tout import, sans écraser un .env.local existant.
 
 ---
 
-## État de la suite de tests après ces sessions
+## Les trois techniques de mock, cœur de l'apprentissage
 
-À ce stade, la suite couvre déjà :
+L'apprentissage le plus précieux de la semaine est la maîtrise de trois 
+techniques de mock distinctes, chacune adaptée à une situation.
 
-- health check
-- chiffrement Fernet
-- cache aside `ServerService`
-- cache aside `CubeService`
-- cache aside `DimensionService`
+### Technique un, la fausse classe explicite
 
-Nombre de tests observé après l'infrastructure : 27 tests passants.
+Pour tester un service qui reçoit son client par injection via le constructeur, 
+on écrit une fausse classe FakeIBMPAClient dans tests/fakes.py. Cette classe 
+implémente les mêmes méthodes que le vrai client mais retourne des données 
+fixes. Elle s'applique à ServerService, CubeService et DimensionService.
 
-Les principaux angles morts restants sont :
+Leçon clé apprise ici. Un mock doit respecter le contrat de la méthode qu'il 
+remplace, pas celui de l'API sous-jacente. Comme le vrai get_servers fait 
+return data.get("value", []) et retourne donc une liste directe, le faux client 
+doit aussi retourner une liste directe, pas l'enveloppe OData complète. J'ai 
+confirmé ce point en inspectant le code réel du client.
 
-- `AuthService`
-- endpoints `/auth/request` et `/auth/verify`
-- dépendances de sécurité `get_current_user` et `get_ibm_pa_client_for_user`
-- client HTTP IBM PA (`httpx`, URL building, erreurs, JSON invalide)
-- routers métier HTTP et mapping des erreurs IBM PA
-- compléments fins sur `raw_data`, doublons et scoping de cache
+La fausse classe a été enrichie progressivement. D'abord pour ServerService 
+avec un compteur d'appels permettant de distinguer cache hit et cache miss. 
+Puis pour CubeService et DimensionService avec des méthodes paramétrées et la 
+mémorisation des derniers paramètres reçus, ce qui permet de vérifier que le 
+service transmet bien le bon nom de serveur ou de cube au client.
+
+### Technique deux, le patch
+
+Pour tester du code qui instancie son client en interne, sans point d'injection, 
+on utilise unittest.mock.patch. C'est le cas de validate_ibm_pa_credentials qui, 
+à cause de la décision D-014, crée IBMPAClient elle-même. Le patch remplace 
+temporairement la classe IBMPAClient là où elle est utilisée, dans le module 
+auth_service, de sorte que même l'instanciation interne utilise le faux.
+
+Leçon clé apprise ici. On patche l'objet là où il est utilisé, pas là où il 
+est défini. Et la distinction entre return_value pour simuler un retour normal 
+et side_effect pour simuler une exception est fondamentale.
+
+Cette technique a aussi révélé un lien profond entre architecture et 
+testabilité. Le choix D-014 d'instancier le client en interne a pour 
+conséquence directe l'obligation d'utiliser patch plutôt que la fausse classe. 
+Un code conçu pour l'injection est plus simple à tester.
+
+### Technique trois, dependency_overrides
+
+Pour tester un endpoint HTTP complet via TestClient, on utilise le mécanisme 
+dependency_overrides de FastAPI. Il permet de remplacer une dépendance réelle 
+par une version de test pour la durée des tests. La fixture client override 
+get_db pour utiliser une base SQLite en mémoire isolée.
+
+Un détail technique important a été anticipé dans l'infrastructure. Le 
+StaticPool avec check_same_thread à False garantit que TestClient et la base 
+partagent le même moteur en mémoire malgré l'exécution potentielle dans des 
+threads différents.
+
+Pour les tests d'endpoint d'authentification, les deux techniques se combinent. 
+Le dependency_overrides gère la base, et le patch gère la validation IBM PA. 
+Chaque mécanisme pour ce qu'il fait de mieux.
 
 ---
 
-## Règle de collaboration pour la suite
+## La couverture finale des tests
 
-Le plan Semaine 5 avance un bullet à la fois. Après chaque bullet, Codex
-doit s'arrêter, résumer ce qui a changé, donner la commande de test lancée,
-indiquer les points à vérifier, et proposer un nom de commit Conventional
-Commits. Le commit et le push restent toujours faits par le développeur
-humain.
+À la fin de la partie test de la semaine 5, le projet compte cinquante-et-un 
+tests répartis sur trois niveaux.
 
-Ordre prévu après cette infrastructure :
+Le niveau unitaire pur avec le chiffrement. Le niveau service avec la logique 
+de cache des trois services métier et la couverture complète d'AuthService 
+incluant l'allowlist, les magic links, les sessions et la validation des 
+credentials. Le niveau endpoint HTTP avec les deux routes d'authentification, 
+le pattern de non-divulgation, et la gestion des cookies de session.
 
-1. tests `AuthService`
-2. tests endpoints auth
-3. tests sécurité et routes protégées
-4. tests client IBM PA
-5. tests routers métier
-6. compléments sur les services cache existants
+Les tests s'exécutent en environ un dixième de seconde. C'est le bénéfice 
+concret des feedback loops. Une vérification qui prenait plusieurs minutes en 
+manuel via Swagger est maintenant instantanée et reproductible.
+
+Le piège du datetime naïf de SQLite, déjà rencontré en semaines 2 et 4, s'est 
+manifesté à nouveau pendant l'écriture des tests d'AuthService, quand 
+db_session.refresh retourne un datetime sans timezone. La normalisation via 
+replace tzinfo timezone utc reste le pattern de résolution. C'est la 
+confirmation que le piège B-2 du skill do_work documente un problème réel et 
+récurrent.
+
+---
+
+## Pour la suite
+
+Il reste à installer Alembic pour gérer les migrations de schéma proprement, 
+ce qui remplacera la suppression manuelle de pa_explorer.db à chaque 
+modification de modèle. Cette étape clôturera la semaine 5.
+
+Plusieurs sujets ont été identifiés mais reportés. Les tests des dépendances 
+de sécurité get_current_user et get_ibm_pa_client_for_user. L'outillage ruff 
+pour le formatage et le linting. Les pre-commit hooks. L'envoi du magic link 
+par email réel via Mailtrap. L'endpoint logout. La résorption de la dette 
+technique D-010 sur l'atomicité transactionnelle de verify_magic_link.
+
+Ces reports sont des choix assumés pour ne pas tomber dans la sur-couverture 
+et garder le cap sur les apprentissages structurants de chaque semaine.
