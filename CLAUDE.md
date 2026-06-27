@@ -3,8 +3,8 @@
 API REST Python/FastAPI pour IBM Planning Analytics SaaS. POC 
 d'apprentissage Claude Code sur 8 semaines.
 
-État actuel : Semaine 4, authentification par magic link, phase 2 
-terminée, phase 3 à venir.
+État actuel : Semaine 5, authentification par magic link terminée,
+Alembic configuré et migrations actives, seed via script dédié.
 
 ## Architecture stricte
 
@@ -30,7 +30,7 @@ Structure des dossiers : `app/clients/` `app/services/` `app/models/`
 ## Pièges critiques à connaître
 
 - SQLite ne stocke pas les timezones, normaliser en UTC à la lecture
-- Modification d'un modèle SQLAlchemy nécessite `del pa_explorer.db` + restart
+- Modification du schéma SQLAlchemy → `alembic revision --autogenerate -m "..."` puis `alembic upgrade head`. Ne jamais supprimer `pa_explorer.db` sans réappliquer migration et seed.
 - IBM PA Basic Auth : username doit être la chaîne littérale `"apikey"`
 - uvicorn lancé via `python -m uvicorn` (pas dans le PATH système)
 

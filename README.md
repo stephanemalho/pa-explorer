@@ -101,18 +101,20 @@ venv/bin/python -m pytest -q
 
 ### Premier démarrage
 
-1. Activer le venv : `.\venv\Scripts\activate` (PowerShell)
+1. Activer le venv : `.\venv\Scripts\activate` (PowerShell) ou `source venv/bin/activate` (macOS/Linux)
 2. Installer les dépendances : `pip install -r requirements.txt`
 3. Copier `.env.example` vers `.env.local` et renseigner les valeurs
-4. Lancer le serveur : `python -m uvicorn app.main:app --reload`
-5. Ouvrir Swagger : http://localhost:8000/docs
+4. Migrer le schéma : `venv/bin/alembic upgrade head`
+5. Peupler les données initiales : `python scripts/seed_db.py`
+6. Lancer le serveur : `python -m uvicorn app.main:app --reload`
+7. Ouvrir Swagger : http://localhost:8000/docs
 
 ### Diagnostiquer l'état de la base
 
 Pour vérifier rapidement l'état de la base SQLite, exécuter le script 
 de diagnostic.
 
-```powershell
+```bash
 python scripts/check_db.py
 ```
 
@@ -120,12 +122,19 @@ Le script liste toutes les tables présentes et le nombre de lignes
 par table. Il affiche aussi le contenu des tables de référence comme 
 user_allowlist.
 
-### Réinitialiser la base après modification d'un modèle
+Pour vérifier la revision Alembic appliquée :
+
+```bash
+venv/bin/alembic current
+```
+
+### Réinitialiser la base
 
 1. Arrêter uvicorn avec Ctrl+C
-2. Fermer l'onglet pa_explorer.db dans VS Code (s'il est ouvert)
-3. Supprimer la base : `del pa_explorer.db`
-4. Relancer le serveur : `python -m uvicorn app.main:app --reload`
+2. Supprimer la base : `del pa_explorer.db` (Windows) ou `rm pa_explorer.db` (macOS/Linux)
+3. Réappliquer les migrations : `venv/bin/alembic upgrade head`
+4. Repeupler les données initiales : `python scripts/seed_db.py`
+5. Relancer le serveur : `python -m uvicorn app.main:app --reload`
 
 ### En cas de fichier verrouillé
 

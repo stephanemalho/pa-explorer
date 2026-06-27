@@ -157,11 +157,42 @@ python -m pytest
 
 Résultat attendu : zéro test en erreur.
 
-**Note** : en semaine 4, aucun test fonctionnel n'existe encore. Cette
-vérification retourne "no tests ran" ou "0 passed" sans valeur de signal.
-Elle deviendra effective dès la semaine 5 quand les premiers tests
-métier seront écrits. Lancer la commande malgré tout pour s'assurer
-qu'il n'y a pas d'erreur de collecte (import error, syntax error).
+---
+
+### B-8 : Interdiction des contournements de tests
+
+**Source** : violation détectée en semaine 5 — ajout d'un `except
+OperationalError` dans `_seed_allowlist()` pour faire passer les tests
+sans corriger le défaut d'architecture sous-jacent.
+
+Il est interdit de faire passer un test en masquant le problème détecté
+plutôt qu'en le résolvant à la racine. Sont explicitement proscrits :
+
+- Attraper une exception (`except Exception`, `except OperationalError`,
+  etc.) dans le code applicatif dans le seul but d'avaler silencieusement
+  une erreur que les tests font remonter
+- Modifier un test pour qu'il accepte un comportement bogué plutôt que
+  corriger le code fautif
+- Désactiver ou `@pytest.mark.skip` un test sans justification documentée
+  dans un commentaire ou dans ce skill
+- Ajouter dans le code applicatif une condition spéciale
+  (`if settings.database_url == ":memory:"`, `if os.getenv("TESTING")`,
+  etc.) dont le seul rôle est de satisfaire l'environnement de test
+
+**Si un test échoue et que la cause est un défaut d'architecture :**
+
+1. Identifier la racine du problème : couplage non prévu, incohérence
+   entre composants, contrat implicite violé.
+2. Formuler un diagnostic factuel à l'utilisateur avec la ligne fautive
+   et la cause structurelle.
+3. Proposer une correction à la racine — une option qui supprime le
+   problème, pas une option qui le cache.
+4. Attendre la validation explicite de l'utilisateur avant d'appliquer
+   toute modification.
+
+Un contournement appliqué sans validation explicite est une violation de
+ce skill. La tâche n'est pas considérée comme terminée tant que la
+correction à la racine n'est pas validée et appliquée.
 
 ---
 
@@ -193,17 +224,21 @@ extension de `Settings`.
 
 ---
 
-### I-3 : Imports de modèles dans `main.py`
+### I-3 : Enregistrement des modèles dans `app/models/__init__.py`
 
-**Source** : architecture observée (semaines 3 et 4).
+**Source** : architecture observée (semaines 3 et 4), centralisée en
+semaine 5 avec la mise en place d'Alembic.
 
-Chaque nouveau modèle SQLAlchemy doit être importé dans `app/main.py`
-avec un commentaire `# noqa: F401` pour que `Base.metadata.create_all`
-crée la table au démarrage. Un modèle non importé ne génère aucune
-erreur — sa table n'est simplement pas créée.
+Chaque nouveau modèle SQLAlchemy doit être importé dans
+`app/models/__init__.py` avec un commentaire `# noqa: F401`. C'est cet
+import groupé qu'Alembic (`env.py`) et l'application (`main.py`)
+consomment via `import app.models`. Un modèle absent de ce fichier ne
+sera pas détecté par `alembic revision --autogenerate` et sa table ne
+sera jamais créée.
 
 ```python
-from app.models import mon_entite  # noqa: F401 — enregistre MonEntite dans la metadata SQLAlchemy
+# app/models/__init__.py
+from app.models.mon_entite import MonEntite  # noqa: F401
 ```
 
 ---
