@@ -19,6 +19,8 @@ Before touching code, read:
 - .claude/rules/alembic-schema.md
 - docs/skills/do_work.md
 
+Use repo skills under .agents/skills/ when a task matches their descriptions.
+
 Treat .claude/rules/*.md as imported project conventions even though Codex
 does not implement Claude-style path frontmatter scoping. Apply each rule when
 working in the paths declared inside that rule file.
