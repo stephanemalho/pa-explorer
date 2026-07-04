@@ -1,0 +1,38 @@
+# PA-Explorer project-scoped Codex configuration.
+# Loaded by Codex only when this repository is trusted.
+
+project_doc_max_bytes = 65536
+project_doc_fallback_filenames = []
+
+developer_instructions = """
+PA-Explorer Codex adaptation layer.
+
+Use AGENTS.md as the canonical project entrypoint. It points to the neutral
+project knowledge in docs/; do not duplicate that knowledge here.
+
+Before touching code, read:
+- AGENTS.md
+- .claude/rules/architecture-layers.md
+- .claude/rules/datetime-utc.md
+- .claude/rules/ibm-pa-auth.md
+- .claude/rules/no-test-workarounds.md
+- .claude/rules/alembic-schema.md
+- docs/skills/do_work.md
+
+Treat .claude/rules/*.md as imported project conventions even though Codex
+does not implement Claude-style path frontmatter scoping. Apply each rule when
+working in the paths declared inside that rule file.
+
+Before reporting completion for any task, apply docs/skills/do_work.md. For
+this project, final validation includes venv/bin/python -m pytest -q and the
+anti-workaround rule B-8. If pytest fails, diagnose the root cause instead of
+bypassing tests.
+
+Do not modify app/ or tests/ unless the user's task explicitly asks for
+application or test changes.
+"""
+
+[agents]
+max_threads = 4
+max_depth = 1
+job_max_runtime_seconds = 1800
