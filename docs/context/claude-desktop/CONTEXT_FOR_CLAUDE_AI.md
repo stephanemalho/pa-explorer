@@ -56,7 +56,7 @@ docs/learning/README.md.
 
 [À METTRE À JOUR À LA FIN DE CHAQUE SEMAINE]
 
-État actuel : Semaine 4 phase 2 terminée le 15 mai 2026.
+État actuel : Semaine 5 terminée le 4 juillet 2026.
 
 Semaine 1 accomplie. Mise en place du projet, premier endpoint health, 
 configuration de base SQLite, gestion des credentials par env files.
@@ -73,23 +73,19 @@ IBM PA. Application sur list_cubes et list_dimensions qui exposent la
 hiérarchie serveur cube dimension. Découverte du piège str.format en 
 Python. Test de validation du steering réussi.
 
-Semaine 4 en cours. Travail sur la planification de tâches complexes 
-via PRDs et multi-phase plans. Application sur l'authentification 
-utilisateur par magic link adapté au contexte IBM PA. Document de 
-roadmap multi_version_support.md créé pour anticiper le support futur 
-V11 V12. Phase 1 du PRD terminée avec les modèles User UserSession 
-UserAllowlist plus le chiffrement Fernet. Phase 2 du PRD terminée 
-avec les endpoints POST /auth/request et GET /auth/verify, le modèle 
-MagicLinkToken, et le mécanisme de magic link à usage unique avec 
-expiration 15 minutes et session 24 heures.
+Semaine 4 accomplie. Authentification utilisateur par magic link adaptée 
+au contexte IBM PA. Document de roadmap multi_version_support.md créé. 
+Modèles User UserSession UserAllowlist MagicLinkToken avec chiffrement 
+Fernet. Endpoints POST /auth/request et GET /auth/verify. Magic link à 
+usage unique, expiration 15 minutes, session 24 heures.
 
-Phase 3 du PRD à venir. Implémentation du middleware qui protège les 
-routes existantes en exigeant un cookie de session valide.
-
-Semaine 5 à venir. Feedback loops, tests pytest avec mocks IBMPAClient, 
-pre-commit hooks, Red-Green Refactor, installation Alembic pour 
-migrations. Migration de l'envoi du magic link vers email réel via 
-Mailtrap au début de la semaine.
+Semaine 5 accomplie. Infrastructure de qualité et feedback loops. 
+51 tests pytest couvrant chiffrement, services métier, AuthService 
+et endpoints HTTP. Trois techniques de mock maîtrisées : fausse classe, 
+patch, dependency_overrides. Skill do_work.md créé, décision D-014 
+documentée. Alembic intégré pour les migrations de schéma, seed déplacé 
+dans scripts/seed_db.py. Restructuration documentaire : 5 rule files 
+dans .claude/rules/, AGENTS.md créé, CLAUDE.md réduit à table des matières.
 
 ## Mode de travail établi entre nous
 

@@ -176,3 +176,10 @@ technique D-010 sur l'atomicité transactionnelle de verify_magic_link.
 
 Ces reports sont des choix assumés pour ne pas tomber dans la sur-couverture 
 et garder le cap sur les apprentissages structurants de chaque semaine.
+
+Points de sécurité à adresser avant mise en production :
+
+- Stratégie de rotation de la clé Fernet à documenter (perte de la clé = base illisible)
+- Stratégie de backup chiffré de la base SQLite
+- Cookie de session : `secure=True` à activer dès le déploiement en HTTPS
+- Investiguer HashiCorp Vault ou équivalent pour la gestion des secrets en production

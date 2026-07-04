@@ -223,3 +223,13 @@ ou d'évaluation. Il peut exposer moins de données, ou des données plus limit�
 que ce qu'exposerait un tenant de production avec des modèles TM1 complexes. 
 Les observations terrain de ce projet sur les champs et les valeurs retournées 
 par l'API sont donc spécifiques à ce contexte.
+
+---
+
+## Sources documentaires IBM
+
+| Source | URL | Quand la consulter |
+| --- | --- | --- |
+| Gestion des actifs TM1 avec Git | `https://www.ibm.com/docs/fr/planning-analytics/3.1.0?topic=api-managing-tm1-database-assets-git` | Déployer des actifs TM1 entre environnements via Git |
+| Troubleshooting API | `https://www.ibm.com/docs/fr/planning-analytics/3.1.0?topic=api-troubleshooting` | Diagnostiquer une erreur de connexion ou de requête |
+| Paramètres TM1 | `https://www.ibm.com/docs/fr/planning-analytics/3.1.0?topic=api-tm1-settings` | Configurer les paramètres avancés du tenant |
