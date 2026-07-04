@@ -1,6 +1,6 @@
 # Compétence : vérifications de qualité avant complétion (do_work)
 
-Ce skill formalise les vérifications que Claude Code doit effectuer
+Ce skill formalise les vérifications que l'agent doit effectuer
 avant de signaler qu'une tâche de développement est terminée. Il
 s'applique à toute modification du code applicatif.
 

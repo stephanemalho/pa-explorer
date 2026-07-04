@@ -15,11 +15,9 @@ contient ce qui a été accompli, les difficultés rencontrées, les surprises,
 et les leçons retenues. À lire pour se replacer dans le contexte du projet 
 et comprendre la trajectoire d'apprentissage.
 
-### claude_code_concepts.md
-Observations et notes spécifiques sur Claude Code, son fonctionnement, 
-ses comportements à connaître, les commandes utiles et les patterns 
-de collaboration efficaces. Distinct de concepts.md qui couvre les 
-concepts techniques de la stack Python. 
+### harness/
+Notes et référentiels de sources spécifiques à chaque harness IA.
+Voir `harness/README.md` pour la structure.
 
 ### concepts.md
 Notes synthétiques sur les concepts techniques découverts au fil du 

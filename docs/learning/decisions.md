@@ -6,6 +6,26 @@ datée et marquée comme définitive ou révisable. Quand je reviens sur le
 code dans plusieurs mois et que je me demande pourquoi tel choix a été 
 fait, c'est ici que je trouve la réponse.
 
+<!--
+MODÈLE — Nouvelle décision architecturale
+
+## D-XXX — [Titre court] [DÉFINITIVE | RÉVISABLE]
+Date : YYYY-MM-DD
+
+### Décision
+[Décision prise, exprimée en une à deux phrases.]
+
+### Justification
+[Pourquoi ce choix a été retenu, avec le contexte de l'époque.]
+
+### Conséquences
+[Ce que cette décision implique pour le développement futur.]
+
+### Conditions de révision
+[Dans quelles circonstances ce choix pourrait être remis en question.
+"Définitive" si le choix est irréversible ou structurant à long terme.]
+-->
+
 ---
 
 ## D-001 — Stack technique principale [DÉFINITIVE]

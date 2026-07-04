@@ -230,6 +230,12 @@ par l'API sont donc spécifiques à ce contexte.
 
 | Source | URL | Quand la consulter |
 | --- | --- | --- |
-| Gestion des actifs TM1 avec Git | `https://www.ibm.com/docs/fr/planning-analytics/3.1.0?topic=api-managing-tm1-database-assets-git` | Déployer des actifs TM1 entre environnements via Git |
+| Doc REST API IBM PA | `https://www.ibm.com/docs/en/planning-analytics/latest?topic=rest-api` | Découvrir un endpoint, vérifier un schéma de réponse |
+| `$metadata` du tenant | `{IBM_PA_BASE_URL}/api/{TENANT_ID}/v0/tm1/$metadata` | Obtenir le schéma OData réel du tenant (priorité sur la doc statique) |
 | Troubleshooting API | `https://www.ibm.com/docs/fr/planning-analytics/3.1.0?topic=api-troubleshooting` | Diagnostiquer une erreur de connexion ou de requête |
 | Paramètres TM1 | `https://www.ibm.com/docs/fr/planning-analytics/3.1.0?topic=api-tm1-settings` | Configurer les paramètres avancés du tenant |
+| Gestion des actifs TM1 avec Git | `https://www.ibm.com/docs/fr/planning-analytics/3.1.0?topic=api-managing-tm1-database-assets-git` | Déployer des actifs TM1 entre environnements via Git |
+
+**Consigne pour l'agent** : toujours consulter le `$metadata` du tenant avant de proposer
+un nouvel endpoint. La doc statique IBM peut diverger du comportement SaaS réel (constaté en S2).
+L'URL validée sur ce tenant : `{IBM_PA_BASE_URL}/api/{TENANT_ID}/v0/tm1/$metadata`.

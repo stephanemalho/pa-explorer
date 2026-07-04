@@ -1,9 +1,9 @@
 # Compétence : ajouter un endpoint IBM PA
 
-Cette compétence décrit la procédure standard d'ajout d'un nouvel endpoint 
-qui consomme une nouvelle entité de l'API IBM Planning Analytics dans 
-PA-Explorer. Elle doit être consultée par Claude Code chaque fois que 
-l'utilisateur demande "ajoute un endpoint pour [entité]" où entité est 
+Cette compétence décrit la procédure standard d'ajout d'un nouvel endpoint
+qui consomme une nouvelle entité de l'API IBM Planning Analytics dans
+PA-Explorer. Elle doit être consultée par l'agent exécutant chaque fois que
+la tâche demande "ajoute un endpoint pour [entité]" où entité est
 une entité IBM PA comme Cubes, Dimensions, Processes, Views, etc.
 
 ## Quand utiliser cette compétence
@@ -153,11 +153,17 @@ Ajouter dans app/config.py la nouvelle variable de TTL.
 Ajouter dans .env.example la même variable avec sa valeur par défaut 
 (typiquement 300 en dev).
 
-## Étape 9 : Réinitialiser la base SQLite
+## Étape 9 : Appliquer la migration Alembic
 
-En environnement de développement, supprimer pa_explorer.db pour que 
-SQLAlchemy recrée la base avec la nouvelle table au prochain démarrage. 
-La procédure complète est dans le README à la racine.
+Générer et appliquer la migration pour la nouvelle table :
+
+```bash
+alembic revision --autogenerate -m "add [entité] table"
+alembic upgrade head
+```
+
+Relire le fichier généré dans `alembic/versions/` avant d'appliquer.
+Voir `docs/skills/add_migration.md` pour la procédure complète.
 
 ## Étape 10 : Tester via Swagger
 

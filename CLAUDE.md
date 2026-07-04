@@ -10,9 +10,11 @@ Alembic configuré et migrations actives, seed via script dédié.
 
 - **Décisions architecturales et leur justification** → `docs/learning/decisions.md`
 - **Concepts Python, FastAPI, SQLAlchemy** → `docs/learning/concepts.md`
-- **Comportements Claude Code, commandes** → `docs/learning/claude_code_concepts.md`
+- **Notes sur Claude Code, commandes** → `docs/learning/harness/anthropic-notes.md`
+- **Sources écosystème Anthropic** → `docs/learning/harness/anthropic.md`
 - **IBM PA endpoints, auth, payloads** → `docs/learning/ibm_pa.md`
 - **Ajouter un endpoint IBM PA** → `docs/skills/add_ibm_pa_endpoint.md`
+- **Ajouter une migration Alembic** → `docs/skills/add_migration.md`
 - **Vision multi-version V11 V12** → `docs/roadmap/multi_version_support.md`
 - **Historique des sessions** → `docs/learning/journal-perso/README.md`
 - **Manuel de prompts** → `docs/learning/prompts.md`
