@@ -7,9 +7,11 @@ harness IA utilisé sur ce projet.
 
 | Fichier | Contenu |
 | --- | --- |
-| `anthropic.md` | Sources de référence pour l'écosystème Anthropic (Claude Code, API) |
+| `codex.md` | Sources de référence pour OpenAI Codex |
+| `claude-code.md` | Sources de référence pour Claude Code |
+| `gemini-cli.md` | Sources de référence pour Gemini CLI |
+| `multi-agent-workflow.md` | Règles de coordination entre harness IA |
 | `anthropic-notes.md` | Observations et comportements spécifiques à Claude Code |
-| `openai.md` | Sources de référence pour l'écosystème OpenAI (Codex, API) |
 
 Ces documents sont les seuls de `docs/` qui peuvent légitimement nommer
 un outil spécifique — c'est leur objet même.

@@ -3,13 +3,11 @@ paths:
   - "app/clients/**"
 ---
 
-# Règle : IBM PA Basic Auth
+@../../docs/agent-rules/ibm-pa-auth.md
 
-Le username IBM PA Basic Auth est toujours la chaîne littérale `"apikey"` — jamais l'email utilisateur.
+# Claude Code adapter — IBM PA auth
 
-```python
-httpx.BasicAuth("apikey", api_key)   # correct
-httpx.BasicAuth(user_email, api_key) # faux → AuthorizedConnectionFailed immédiat
-```
+Canonical rule: `docs/agent-rules/ibm-pa-auth.md`.
 
-Source : D-004 dans `docs/learning/decisions.md`.
+This file preserves Claude Code path scoping only. Do not duplicate project
+rules here.

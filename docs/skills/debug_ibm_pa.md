@@ -68,12 +68,12 @@ curl -u "apikey:<IBM_PA_API_KEY>" ...    # correct
 curl -u "email@exemple.com:<clé>" ...   # faux → 401/403
 ```
 
-→ Règle complète : `.claude/rules/ibm-pa-auth.md`
+→ Règle complète : `docs/agent-rules/ibm-pa-auth.md`
 
 ---
 
 ## Référence
 
 - `docs/learning/ibm_pa.md` — endpoints découverts, pièges, sources IBM officielles
-- `.claude/rules/ibm-pa-auth.md` — règle d'authentification
+- `docs/agent-rules/ibm-pa-auth.md` — règle d'authentification canonique
 - `docs/learning/decisions.md` D-004 — décision sur l'auth IBM PA

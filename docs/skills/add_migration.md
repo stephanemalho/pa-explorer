@@ -4,7 +4,7 @@ Ce skill décrit la procédure pour modifier un modèle SQLAlchemy et générer
 la migration Alembic correspondante. À suivre systématiquement — ne jamais
 modifier le schéma sans passer par Alembic.
 
-→ Règle complète : `.claude/rules/alembic-schema.md`
+→ Règle complète : `docs/agent-rules/alembic-schema.md`
 
 ---
 
@@ -73,6 +73,6 @@ Si la base doit être réinitialisée (dev uniquement) :
 
 ## Référence
 
-- `.claude/rules/alembic-schema.md` — règle scopée sur `app/models/**` et `alembic/**`
+- `docs/agent-rules/alembic-schema.md` — règle canonique sur `app/models/**` et `alembic/**`
 - `README.md` — section "Réinitialiser la base"
 - `docs/learning/decisions.md` — D-001 (stack), D-015 (fixtures de test)

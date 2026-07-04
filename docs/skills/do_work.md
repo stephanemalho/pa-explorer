@@ -28,7 +28,7 @@ Ces vérifications doivent toutes passer avant de signaler la complétion.
 
 ### B-1 : Pattern client → service → router sans fuite de couche
 
-→ Règle complète : `.claude/rules/architecture-layers.md`
+→ Règle complète : `docs/agent-rules/architecture-layers.md`
 
 Vérifier :
 
@@ -47,7 +47,7 @@ Ces commandes ne doivent retourner aucun résultat.
 
 ### B-2 : Normalisation UTC à la lecture SQLite
 
-→ Règle complète : `.claude/rules/datetime-utc.md`
+→ Règle complète : `docs/agent-rules/datetime-utc.md`
 
 Avant toute comparaison avec `datetime.now(timezone.utc)`, vérifier que les champs
 `expires_at`, `used_at`, `cache_expires_at`, `last_used_at` sont normalisés :
@@ -87,7 +87,7 @@ Un champ absent d'un de ces trois endroits disparaît silencieusement sans erreu
 
 ### B-5 : Authentification IBM PA — username littéral `"apikey"`
 
-→ Règle complète : `.claude/rules/ibm-pa-auth.md`
+→ Règle complète : `docs/agent-rules/ibm-pa-auth.md`
 
 ```python
 httpx.BasicAuth("apikey", api_key)  # correct
@@ -118,7 +118,7 @@ Résultat attendu : zéro erreur.
 
 ### B-8 : Interdiction des contournements de tests
 
-→ Règle complète : `.claude/rules/no-test-workarounds.md`
+→ Règle complète : `docs/agent-rules/no-test-workarounds.md`
 
 Si un test échoue pour un défaut d'architecture : diagnostiquer la racine,
 formuler un diagnostic factuel, attendre validation explicite avant d'implémenter
@@ -142,7 +142,7 @@ dans `.env.example`.
 
 ### I-3 : Enregistrement dans `app/models/__init__.py`
 
-→ Règle complète : `.claude/rules/alembic-schema.md`
+→ Règle complète : `docs/agent-rules/alembic-schema.md`
 
 Chaque nouveau modèle SQLAlchemy doit être importé dans `app/models/__init__.py`
 avec `# noqa: F401`. Un modèle absent ne sera pas détecté par
@@ -208,4 +208,5 @@ Exécuter dans l'ordre. Ne pas passer à la suivante si la précédente échoue.
 
 - `docs/skills/add_ibm_pa_endpoint.md` — procédure pour l'ajout d'un endpoint IBM PA
 - `docs/learning/decisions.md` — décisions D-001 à D-015
-- `.claude/rules/` — règles scopées chargées automatiquement
+- `docs/agent-rules/` — règles projet canoniques
+- `.claude/rules/` — adaptateurs scopés Claude Code

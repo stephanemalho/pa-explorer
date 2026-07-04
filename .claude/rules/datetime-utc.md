@@ -4,16 +4,11 @@ paths:
   - "app/services/**"
 ---
 
-# Règle : datetimes toujours normalisés en UTC
+@../../docs/agent-rules/datetime-utc.md
 
-SQLite ignore `DateTime(timezone=True)` : les datetimes lus depuis la base sont **naïfs** (sans tzinfo).
+# Claude Code adapter — datetime UTC
 
-Avant toute comparaison avec `datetime.now(timezone.utc)`, normaliser :
+Canonical rule: `docs/agent-rules/datetime-utc.md`.
 
-```python
-if dt.tzinfo is None:
-    dt = dt.replace(tzinfo=timezone.utc)
-```
-
-Champs concernés : `expires_at`, `used_at`, `cache_expires_at`, `last_used_at` — et tout futur
-champ datetime introduit sur un nouveau modèle.
+This file preserves Claude Code path scoping only. Do not duplicate project
+rules here.

@@ -8,27 +8,31 @@ developer_instructions = """
 PA-Explorer Codex adaptation layer.
 
 Use AGENTS.md as the canonical project entrypoint. It points to the neutral
-project knowledge in docs/; do not duplicate that knowledge here.
+project knowledge in docs/.
 
-Before touching code, read:
-- AGENTS.md
-- .claude/rules/architecture-layers.md
-- .claude/rules/datetime-utc.md
-- .claude/rules/ibm-pa-auth.md
-- .claude/rules/no-test-workarounds.md
-- .claude/rules/alembic-schema.md
-- docs/skills/do_work.md
+Do not duplicate canonical project rules here. This file is only the Codex
+adapter.
 
-Use repo skills under .agents/skills/ when a task matches their descriptions.
+Before touching code:
+1. Read AGENTS.md.
+2. Identify the task type.
+3. Read the relevant files from docs/agent-rules/.
+4. Read the relevant workflow from docs/skills/.
+5. Use repo skills under .agents/skills/ when a task matches their descriptions.
 
-Treat .claude/rules/*.md as imported project conventions even though Codex
-does not implement Claude-style path frontmatter scoping. Apply each rule when
-working in the paths declared inside that rule file.
+Treat docs/agent-rules/*.md as the canonical project conventions.
+
+Before changing Codex-specific files, check the official Codex documentation:
+- https://developers.openai.com/codex/guides/agents-md
+- https://developers.openai.com/codex/config-basic
+- https://developers.openai.com/codex/config-advanced
+- https://developers.openai.com/codex/config-reference
+- https://developers.openai.com/codex/skills
+- https://developers.openai.com/codex/subagents
 
 Before reporting completion for any task, apply docs/skills/do_work.md. For
-this project, final validation includes venv/bin/python -m pytest -q and the
-anti-workaround rule B-8. If pytest fails, diagnose the root cause instead of
-bypassing tests.
+this project, final validation includes venv/bin/python -m pytest -q when
+relevant. If pytest fails, diagnose the root cause instead of bypassing tests.
 
 Do not modify app/ or tests/ unless the user's task explicitly asks for
 application or test changes.

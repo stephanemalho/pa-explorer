@@ -239,8 +239,9 @@ commit fréquent permet de reprendre facilement au point d'arrêt.
 
 Quand la limite est atteinte, sauvegarder l'état du travail dans le 
 journal et reprendre plus tard avec un prompt contextuel qui rappelle 
-où on s'est arrêté. Les fichiers learning et CONTEXT_FOR_CLAUDE_AI 
-sont précieux pour ces reprises.
+où on s'est arrêté. Les fichiers learning et
+`docs/context/conversational-ai/PROJECT_LEARNING_CONTEXT.md` sont précieux pour
+ces reprises.
 
 ### Désynchronisation entre plan et exécution
 

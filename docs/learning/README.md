@@ -19,6 +19,11 @@ et comprendre la trajectoire d'apprentissage.
 Notes et référentiels de sources spécifiques à chaque harness IA.
 Voir `harness/README.md` pour la structure.
 
+### ../context/conversational-ai/PROJECT_LEARNING_CONTEXT.md
+Contexte synthétique à copier-coller dans une IA conversationnelle pour obtenir
+des conseils d'apprentissage à jour sur PA-Explorer, ses accomplissements et les
+prochaines étapes.
+
 ### concepts.md
 Notes synthétiques sur les concepts techniques découverts au fil du 
 parcours, organisés par thème. Sections sur Python, FastAPI, SQLAlchemy, 
