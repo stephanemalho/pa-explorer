@@ -164,9 +164,12 @@ récurrent.
 
 ## Pour la suite
 
-Il reste à installer Alembic pour gérer les migrations de schéma proprement, 
-ce qui remplacera la suppression manuelle de pa_explorer.db à chaque 
-modification de modèle. Cette étape clôturera la semaine 5.
+Alembic a depuis été installé pour gérer les migrations de schéma proprement, 
+ce qui remplace la suppression manuelle de pa_explorer.db à chaque modification 
+de modèle. La migration initiale `5e9bf0f2db8c` est appliquée (head), le seed a 
+été déplacé dans `scripts/seed_db.py`, et la règle canonique 
+`docs/agent-rules/alembic-schema.md` acte qu'Alembic est l'unique propriétaire 
+du schéma. Cette étape clôture la semaine 5.
 
 Plusieurs sujets ont été identifiés mais reportés. Les tests des dépendances 
 de sécurité get_current_user et get_ibm_pa_client_for_user. L'outillage ruff 

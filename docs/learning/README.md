@@ -81,20 +81,21 @@ exécutables par Claude Code. Découpage de features sur plusieurs fenêtres
 de contexte avec multi-phase plans. Pattern des tracer bullets pour 
 valider une architecture avant l'investissement complet.
 
-### Semaine 5 — Feedback Loops [EN_COURS]
+### Semaine 5 — Feedback Loops [TERMINÉE]
 La question fondamentale "le code est-il bon marché ?" et son impact 
-sur la philosophie de prototypage. Construction d'un skill "Do Work" 
-qui enseigne à Claude comment livrer proprement. Pre-commit hooks pour 
-empêcher du code mal formaté. Application du Red-Green Refactor sur 
-PA-Explorer. Mise en place d'une suite de tests pytest robuste avec 
-mocks de l'API IBM PA. Migration vers Alembic pour la gestion du schéma 
-de base de données. Premiers livrables réalisés : tests des services
-cache `ServerService`, `CubeService`, `DimensionService` avec fake IBM PA,
-puis infrastructure pytest partagée avec fixtures séparées par domaine,
-DB SQLite isolée par test, et `TestClient` FastAPI branché sur `get_db`
-de test.
+sur la philosophie de prototypage. Livrables réalisés : skill `do_work` 
+(`docs/skills/do_work.md`) qui enseigne à Claude comment livrer proprement, 
+suite de 51 tests pytest couvrant chiffrement, services cache 
+(`ServerService`, `CubeService`, `DimensionService` avec fake IBM PA), 
+`AuthService` et endpoints HTTP, infrastructure pytest partagée avec 
+fixtures séparées par domaine, DB SQLite isolée par test, `TestClient` 
+FastAPI branché sur `get_db` de test, trois techniques de mock maîtrisées 
+(fausse classe, `patch`, `dependency_overrides`), décision D-014 documentée, 
+et intégration d'Alembic pour la gestion du schéma (seed déplacé dans 
+`scripts/seed_db.py`). Reportés volontairement à plus tard : ruff, 
+pre-commit hooks, tests des dépendances de sécurité, endpoint logout.
 
-### Semaine 6 — Pattern Ralph et tâches autonomes [À VENIR]
+### Semaine 6 — Pattern Ralph et tâches autonomes [EN_COURS]
 Découverte du pattern Ralph d'orchestration autonome où l'agent travaille 
 en boucle sur un backlog. Comparaison HITL (Human In The Loop) versus 
 AFK (Away From Keyboard). Mise en place d'un sandbox sécurisé pour les 
