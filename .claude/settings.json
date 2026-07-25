@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(python -m pytest*)",
+      "Bash(venv/bin/python -m pytest*)",
+      "Bash(.venv/bin/python -m pytest*)",
+      "Bash(alembic current*)",
+      "Bash(alembic check*)",
+      "Bash(venv/bin/alembic current*)",
+      "Bash(venv/bin/alembic check*)",
+      "Bash(python -m alembic current*)",
+      "Bash(python -m alembic check*)",
+      "Bash(ruff check*)",
+      "Bash(ruff format --check*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git show*)",
+      "Bash(git branch*)"
+    ],
+    "deny": [
+      "Bash(rm -rf*)",
+      "Bash(rm -fr*)",
+      "Bash(rm -r *)",
+      "Bash(git push*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean*)",
+      "Bash(alembic downgrade*)",
+      "Bash(venv/bin/alembic downgrade*)",
+      "Bash(python -m alembic downgrade*)",
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./secrets/**)",
+      "Edit(./.env)",
+      "Edit(./.env.*)",
+      "Edit(./secrets/**)"
+    ]
+  }
+}

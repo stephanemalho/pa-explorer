@@ -113,3 +113,34 @@ feedback loop qui tranche sans jugement humain.
 
 Prochaine brique à choisir : cadrer le sandbox, lancer une boucle Ralph sur
 T-01, ou traiter T-01 en HITL classique comme rendu de référence.
+
+---
+
+## Avancement — brique 2 : le sandbox
+
+Deuxième brique traitée : le cadrage du périmètre AFK, avec deux artefacts
+complémentaires.
+
+- **Politique neutre** : `docs/agent-workflows/sandbox.md` définit le périmètre
+  de commandes (autorisé / interdit), le périmètre de fichiers (`tests/**` pour
+  les tâches AFK actuelles, `app/**` en HITL, le reste hors périmètre) et les
+  garde-fous adossés à `do_work` et aux règles canoniques.
+- **Application Claude Code** : `.claude/settings.json` (versionné) encode la
+  partie commandes en `permissions.allow` / `deny`.
+
+Choix de conception important : `.claude/settings.json` s'applique à **toutes**
+les sessions Claude Code, pas seulement AFK. On garde donc la config
+conservatrice — auto-autoriser le sûr (pytest, git en lecture, alembic en
+lecture, ruff check) et interdire dur le catastrophique (`rm -r/-rf`,
+`git push`, `git reset --hard`, `git clean`, `alembic downgrade`, lecture/écriture
+des secrets). Le périmètre fin de fichiers reste appliqué par la **revue humaine
+du diff**, pas par la config partagée, pour ne pas brider le travail supervisé
+légitime hors périmètre.
+
+Enseignement de l'étape : un sandbox n'est pas qu'une liste de blocages. C'est
+la traduction, en règles exécutables par le harness, de la frontière entre ce
+qui est réversible/vérifiable et ce qui ne l'est pas. Le `deny` prime sur
+l'`allow` : en cas de doute, c'est l'interdiction qui gagne.
+
+Prochaine brique : lancer une première boucle Ralph sur T-01, ou traiter T-01
+en HITL classique comme rendu de référence.
