@@ -27,6 +27,7 @@ Canonical project rules live in:
 - `docs/agent-rules/ibm-pa-auth.md`
 - `docs/agent-rules/no-test-workarounds.md`
 - `docs/agent-rules/alembic-schema.md`
+- `docs/agent-rules/git-workflow.md`
 
 Harness-specific folders such as `.claude/`, `.codex/`, `.agents/`, and
 `GEMINI.md` are adapters only. They must reference the neutral rules instead of
@@ -89,6 +90,7 @@ Codex-compatible skill wrappers live in `.agents/skills/`.
 | IBM PA debugging | `docs/skills/debug_ibm_pa.md`, `docs/learning/ibm_pa.md` |
 | Architecture/refactor work | `docs/agent-rules/architecture-layers.md`, `docs/learning/decisions.md` |
 | Completion/reporting | `docs/skills/do_work.md` |
+| Git branch / commit après action | `docs/agent-rules/git-workflow.md`, `docs/agent-workflows/operating-modes.md` |
 
 ## Agent Workflow
 
