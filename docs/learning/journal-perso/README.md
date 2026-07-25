@@ -23,3 +23,8 @@ Chronologie des sessions de travail, organisée par semaine du parcours d'appren
 - [Semaine 5 — Feedback Loops](semaine-5.md)
   Mise en place progressive d'une vraie boucle pytest : configuration pytest, fixtures
   partagées par domaine, SQLite isolé par test, et préparation des tests auth/API/client.
+  Clôturée avec l'intégration d'Alembic et une suite de 51 tests au vert.
+
+- [Semaine 6 — Pattern Ralph et tâches autonomes](semaine-6.md)
+  Passage du travail piloté pas à pas à la délégation de tâches délimitées : HITL vs AFK,
+  pattern Ralph d'orchestration en boucle sur un backlog, sandbox et limites de sécurité.
