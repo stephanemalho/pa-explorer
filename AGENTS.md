@@ -17,6 +17,8 @@ project knowledge lives in `docs/`.
 - Learning journal: `docs/learning/journal-perso/`
 - Harness references: `docs/learning/harness/`
 - Conversational AI learning context: `docs/context/conversational-ai/PROJECT_LEARNING_CONTEXT.md`
+- TM1 delivery rules referential (PA-PROMOTE): `docs/learning/REGLES-LIVRAISON-TM1.md`
+- PA-PROMOTE learning path (weeks 9–12): `docs/learning/SUITE-PARCOURS-PA-PROMOTE.md`
 
 ## Canonical Rules
 
@@ -79,6 +81,22 @@ Codex-compatible skill wrappers live in `.agents/skills/`.
 - Gemini CLI commands: https://google-gemini.github.io/gemini-cli/docs/cli/commands.html
 - Gemini CLI extensions: https://google-gemini.github.io/gemini-cli/docs/extensions/
 
+### IBM Planning Analytics
+
+Reference sources for the TM1 REST API and the delivery logic (PA-PROMOTE cap).
+Synthesized in `docs/learning/REGLES-LIVRAISON-TM1.md`; consult the originals when
+you need endpoint or auth details. If a URL is not fetchable, do not guess — rely on
+the referential and flag it.
+
+- TM1 REST API introduction: https://www.ibm.com/docs/en/planning-analytics/2.0.0?topic=overview-tm1-rest-api-introduction
+- TM1 model source specification (tm1project): https://www.ibm.com/docs/en/planning-analytics/2.0.0?topic=git-tm1-model-source-specification
+- OData overview (object model): https://www.ibm.com/support/knowledgecenter/en/SSD29G_2.0.0/com.ibm.swg.ba.cognos.tm1_rest_api.2.0.0.doc/dg_tm1_odata_overview.html
+- Authenticating and managing sessions — V11 (CAMNamespace / CAMPassport): https://www.ibm.com/docs/en/planning-analytics/2.0.0?topic=api-authenticating-managing-sessions
+- Authenticating REST requests — V12 (OIDC/OAuth): https://www.ibm.com/docs/en/planning-analytics/3.1.0?topic=api-authenticating-rest-requests
+- Getting started with TM1 Database 12 (Planning Analytics Engine, V12): https://www.ibm.com/docs/SSD29G_3.1.0/com.ibm.swg.ba.cognos.planning_analytics_engine.2.0.0.doc/pa_engine_getting_started.html
+- TM1 REST API reference (PDF, v11r2): https://www.ibm.com/docs/en/SSD29G_2.0.0/com.ibm.swg.ba.cognos.tm1_rest_api.2.0.0.doc/tm1_rest_api.pdf
+- TM1py developer interface — community endpoint reference (indicative): https://tm1py.readthedocs.io/en/latest/api.html
+
 ## Task Routing
 
 | Task type | Required reading |
@@ -91,6 +109,7 @@ Codex-compatible skill wrappers live in `.agents/skills/`.
 | Architecture/refactor work | `docs/agent-rules/architecture-layers.md`, `docs/learning/decisions.md` |
 | Completion/reporting | `docs/skills/do_work.md` |
 | Git branch / commit après action | `docs/agent-rules/git-workflow.md`, `docs/agent-workflows/operating-modes.md` |
+| Livraison / promotion d'objets TM1 | `docs/agent-rules/promotion-rules.md`, `docs/learning/REGLES-LIVRAISON-TM1.md` |
 
 ## Agent Workflow
 

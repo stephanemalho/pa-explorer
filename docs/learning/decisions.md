@@ -410,3 +410,45 @@ ou un magic link dans chaque fichier.
 
 Si une nouvelle famille de fixtures grossit, créer un module dédié sous
 `tests/fixtures/` plutôt que d'allonger `conftest.py`.
+
+---
+
+## D-016 — App desktop Electron + React + Carbon, backend FastAPI en sidecar, couche VersionProvider V11/V12 [RÉVISABLE]
+Date : 25 juillet 2026
+
+### Décision
+Le cap PA-PROMOTE (livraison d'objets TM1 d'un serveur source vers un serveur
+cible, semaines 9 à 12) prend la forme d'une application desktop : Electron, React
+et IBM Carbon Design System pour l'interface, avec le backend FastAPI existant
+embarqué en sidecar (processus Python packagé avec `PyInstaller`, lancé par le main
+process Electron, communication IPC via HTTP localhost). Le support multi-version
+passe par une couche d'abstraction `VersionProvider`, avec deux implémentations
+`V11Provider` et `V12Provider` qui isolent les seules différences entre V11 et V12
+derrière une interface uniforme consommée par le moteur de livraison.
+
+### Justification
+Ce choix réutilise le backend existant : le client `httpx`, l'authentification IBM
+PA, le pattern cache-aside et les services `ServerService`, `CubeService` et
+`DimensionService` deviennent le cœur du moteur de livraison, sans réécriture. IBM
+Carbon donne un rendu familier aux consultants TM1, proche de PAW, ce qui réduit la
+friction d'adoption par rapport à une interface maison. Electron avec
+`electron-builder` (NSIS) produit un exécutable installable par un consultant sans
+terminal ni environnement Python. Enfin, le modèle objet OData v4 est commun à V11
+et V12 ; seules trois choses changent réellement, à savoir l'authentification, le
+scope d'URL par base de données et l'accès fichier des processus TI. Les isoler
+derrière `VersionProvider` garde le moteur de livraison agnostique de la version.
+Voir `docs/learning/REGLES-LIVRAISON-TM1.md` section 14 (règles VN1 à VN6).
+
+### Conséquences
+Le projet gagne un dossier `desktop/` (Electron et React) et, à terme, un module
+`app/promotion/` côté backend. Le backend reste utilisable seul en tant qu'API ;
+l'app desktop ne fait que l'empaqueter. Toute feature de livraison relève de
+`docs/agent-rules/promotion-rules.md` et du référentiel
+`docs/learning/REGLES-LIVRAISON-TM1.md`, qui reste la source de vérité. Une nouvelle
+chaîne d'empaquetage (`PyInstaller` puis `electron-builder`) est à maintenir.
+
+### Conditions de révision
+Décision révisable. Si l'empaquetage sidecar s'avère trop coûteux à maintenir, ou si
+un besoin web ou multi-utilisateur émerge, réévaluer l'option d'un frontend web servi
+par le backend plutôt qu'une app desktop. De même, si les écarts entre V11 et V12
+dépassent les trois points isolés, revoir le périmètre de `VersionProvider`.

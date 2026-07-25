@@ -37,6 +37,19 @@ particularités d'authentification, structure des réponses, pièges connus,
 et concepts du domaine TM1 comme les cubes, dimensions, processus. À 
 consulter pour toute question liée à IBM PA.
 
+### REGLES-LIVRAISON-TM1.md
+Référentiel métier des règles de livraison TM1 (promotion source vers cible)
+via l'API REST OData. Source de vérité du cap PA-PROMOTE : ordre topologique,
+règles objet par objet (dimensions, hiérarchies, éléments, cubes, règles,
+vues, processus, chores), dry-run, aucune suppression implicite, et couche
+multi-version V11/V12. À consulter avant toute feature de livraison.
+
+### SUITE-PARCOURS-PA-PROMOTE.md
+Plan des semaines 9 à 12 du parcours : transformation de PA-Explorer en app
+desktop de livraison (Electron + Carbon + sidecar FastAPI), roadmap produit
+M0 à M5, encadré VersionProvider et fils rouges de gouvernance. Prolonge le
+parcours des semaines 1 à 8.
+
 ### decisions.md
 Historique des décisions architecturales prises avec leur justification 
 contextuelle. Permet de retrouver pourquoi tel ou tel choix a été fait 
@@ -54,7 +67,11 @@ Le parcours suit une adaptation du programme AIhero "Claude Code for
 Real Engineers", étalé sur huit semaines à raison de quatre à six heures 
 par semaine. L'objectif est de monter en compétence sur l'utilisation 
 avancée de Claude Code tout en construisant PA-Explorer comme projet 
-fil rouge.
+fil rouge. Le parcours se prolonge ensuite avec les semaines 9 à 12 
+(cap « livraison PA-PROMOTE ») : PA-Explorer passe de la lecture d'un 
+modèle IBM PA à la livraison d'objets TM1 d'un serveur source vers un 
+serveur cible, sous la forme d'une app desktop téléchargeable. Le plan 
+détaillé de cette suite vit dans `SUITE-PARCOURS-PA-PROMOTE.md`.
 
 ### Semaine 1 — Prise en main de Claude Code [TERMINÉE]
 Installation et configuration de Claude Code, gestion de session, 
@@ -112,6 +129,45 @@ Conception d'un codebase que l'IA aime maintenir. Écriture d'un skill
 "Improve My Codebase". Conscience des modules dans le skill PRD. Bilan 
 réflexif du parcours et préparation à l'intégration future d'agents IA 
 dans PA-Explorer.
+
+### Semaine 9 — Fondations PA-PROMOTE : desktop shell et double connexion [À VENIR]
+Bascule de la lecture à la livraison : PA-Explorer devient une app desktop 
+qui promeut des objets TM1 d'un serveur source vers un serveur cible. 
+Bootstrap d'une nouvelle surface Electron + React + IBM Carbon Design System 
+au-dessus du backend FastAPI existant embarqué en sidecar, empaqueté en `.exe` 
+(tracer bullet : l'app démarre, lance le sidecar, ping le health endpoint). 
+Écran Connexions à deux serveurs source et cible avec sélecteur de version 
+V11 ou V12. Introduction de la couche d'abstraction VersionProvider (V11 = 
+Basic/CAM mode 5, V12 = OIDC/OAuth) et gap analysis du repo GitHub PA-PROMOTE, 
+source d'inspiration. Décision D-016 figée.
+
+### Semaine 10 — Exploration du modèle façon IBM PA [À VENIR]
+Conception d'un PRD exécutable multi-phases pour l'explorateur d'objets, 
+découpé sur plusieurs fenêtres de contexte, en réinvestissant le pattern 
+feedback-loop de la semaine 5. Endpoints backend d'inventaire (cubes, 
+dimensions, processus, chores et leurs enfants) via l'API OData avec 
+cache-aside, UI arbre d'objets Carbon (TreeView, chargement paresseux, 
+recherche, panneau de détail) « exactement comme sur IBM PA ». Tests des 
+services d'inventaire avec un faux IBM PA et mise à jour de `ibm_pa.md`.
+
+### Semaine 11 — Moteur de livraison : diff, dépendances, dry-run [À VENIR]
+Le cœur technique et le plus risqué, mené en HITL strict avec revue de diff 
+systématique car on touche à des opérations destructives potentielles. Module 
+`app/promotion/` : diff source vers cible, graphe de dépendances et tri 
+topologique selon l'ordre canonique du référentiel, validateur produisant un 
+rapport de bloquants (par exemple un cube non livrable car ses dimensions 
+manquent côté cible). Dry-run obligatoire, sans écriture. UI de plan de 
+livraison. Chaque règle de `REGLES-LIVRAISON-TM1.md` couverte par au moins un 
+test. Écriture du skill `add_promotion_rule`.
+
+### Semaine 12 — Exécution, sécurité de déploiement, packaging et bilan [À VENIR]
+Passage du prototype au livrable installable. Exécution ordonnée de la 
+livraison de structure (barre de progression, arrêt/reprise, séparation stricte 
+livraison ≠ exécution), piste données/sécurité minimale via processus TI 
+(SaveDataAll et backup en pré-pull), journal d'audit consultable dans l'app, 
+packaging `.exe` final. Écriture du skill `improve_my_codebase` et résorption 
+de la dette ruff/pre-commit reportée de la semaine 5. Bilan réflexif : de la 
+lecture PA-Explorer à la livraison PA-PROMOTE.
 
 ## Pour démarrer une nouvelle session de travail
 

@@ -29,6 +29,15 @@ L'aspect novateur du POC est qu'il peut aussi servir de démonstration interne
 pour l'intégration de Git et GitHub dans le workflow de gestion d'actifs TM1,
 sujet auquel l'équipe commence à s'intéresser.
 
+À partir de la semaine 9, le projet prend un nouveau cap, dit « PA-PROMOTE » :
+passer de la lecture d'un modèle IBM PA à la **livraison** (promotion) d'objets
+TM1 d'un serveur source vers un serveur cible, via l'API REST OData. Le même
+backend FastAPI devient le cœur d'un moteur de livraison, empaqueté dans une
+application desktop téléchargeable (Electron + React + IBM Carbon), avec une
+couche d'abstraction `VersionProvider` gérant les serveurs en V11 et V12. La
+source de vérité de cette capacité est le référentiel
+`docs/learning/REGLES-LIVRAISON-TM1.md`.
+
 ## Profil d'apprentissage
 
 Le porteur du projet est développeur confirmé sur plusieurs langages, avec une
@@ -47,11 +56,15 @@ les arbitrages, et distinguent les faits observés des hypothèses.
 
 ## Programme d'apprentissage
 
-Le parcours suit une adaptation d'un programme de huit semaines sur les agents
-IA de développement. Le détail complet est dans `docs/learning/README.md`.
+Le parcours suit une adaptation d'un programme initialement de huit semaines sur
+les agents IA de développement, prolongé par un cap « livraison PA-PROMOTE » qui
+couvre les semaines 9 à 12. Le détail complet est dans `docs/learning/README.md`,
+et le plan de la suite dans `docs/learning/SUITE-PARCOURS-PA-PROMOTE.md`.
 
-État actuel au 2026-07-04 : semaine 5 terminée, fondation multi-harness en
-cours de consolidation.
+État actuel au 2026-07-25 : semaine 5 terminée, semaine 6 en cours (sandbox AFK,
+fondation multi-harness) ; le cap PA-PROMOTE est défini (décision D-016) et
+documenté pour les semaines 9 à 12, mais le code de livraison n'a pas encore
+démarré.
 
 ## Accomplissements par semaine
 
@@ -101,6 +114,8 @@ dans `docs/skills/`, et chaque harness garde seulement un adaptateur mince.
 - Règles canoniques : `docs/agent-rules/`
 - Procédures opérationnelles : `docs/skills/`
 - Référentiel IBM PA : `docs/learning/ibm_pa.md`
+- Référentiel de livraison TM1 (PA-PROMOTE) : `docs/learning/REGLES-LIVRAISON-TM1.md`
+- Plan des semaines 9 à 12 : `docs/learning/SUITE-PARCOURS-PA-PROMOTE.md`
 - Décisions architecturales : `docs/learning/decisions.md`
 - Journal d'apprentissage : `docs/learning/journal-perso/`
 - Références par harness : `docs/learning/harness/`
@@ -123,6 +138,9 @@ Le détail complet est dans `docs/learning/decisions.md`. Résumé :
 - Champ `raw_data` conservé sur les modèles IBM PA pour absorber les évolutions
   de payload et fournir de la matière aux analyses IA.
 - Alembic est l'unique propriétaire du schéma applicatif.
+- Cap PA-PROMOTE : application desktop Electron + React + Carbon avec le backend
+  FastAPI en sidecar et une couche `VersionProvider` V11/V12 (D-016). Livraison
+  en ordre topologique, dry-run par défaut, aucune suppression implicite.
 
 ## Points techniques à retenir
 
@@ -154,6 +172,34 @@ relations entre cubes, dimensions et processus dans PA-Explorer.
 Consolider le codebase pour qu'il soit facile à maintenir par des humains et des
 agents IA. Faire le bilan du parcours et préparer l'intégration future d'agents
 IA dans PA-Explorer.
+
+### Semaine 9
+
+Ouvrir le cap PA-PROMOTE : bootstrapper l'application desktop (Electron + React +
+Carbon) au-dessus du backend FastAPI en sidecar, empaqueter un `.exe` minimal
+(tracer bullet), et poser l'écran de double connexion source/cible avec la couche
+`VersionProvider` (V11 CAM mode 5 / V12 OAuth). Gap analysis du repo PA-PROMOTE.
+
+### Semaine 10
+
+Construire l'explorateur d'objets « façon IBM PA » : endpoints d'inventaire OData
+(cubes, dimensions, processus, chores et leurs enfants) avec cache-aside, et une
+UI arbre d'objets Carbon (lazy loading, recherche, panneau de détail). Tests des
+services d'inventaire avec un faux IBM PA.
+
+### Semaine 11
+
+Implémenter le moteur de livraison en HITL strict : diff source/cible, graphe de
+dépendances et tri topologique, validateur de bloquants, dry-run obligatoire.
+Chaque règle de `docs/learning/REGLES-LIVRAISON-TM1.md` couverte par au moins un
+test.
+
+### Semaine 12
+
+Passer au livrable installable : exécution ordonnée de la livraison (séparation
+livraison ≠ exécution), piste données/sécurité minimale via processus TI, journal
+d'audit, packaging `.exe` final et résorption de la dette ruff/pre-commit. Bilan
+du parcours.
 
 ## Mode de collaboration attendu
 

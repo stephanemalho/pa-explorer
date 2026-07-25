@@ -28,3 +28,7 @@ Chronologie des sessions de travail, organisée par semaine du parcours d'appren
 - [Semaine 6 — Pattern Ralph et tâches autonomes](semaine-6.md)
   Passage du travail piloté pas à pas à la délégation de tâches délimitées : HITL vs AFK,
   pattern Ralph d'orchestration en boucle sur un backlog, sandbox et limites de sécurité.
+
+- [Semaine 9 — Fondations PA-PROMOTE](semaine-9.md)
+  Cap PA-PROMOTE : PA-Explorer passe de la lecture à la livraison d'objets TM1 (source vers
+  cible). Stack figée (D-016), référentiel de règles comme source de vérité, jalon M0 desktop.

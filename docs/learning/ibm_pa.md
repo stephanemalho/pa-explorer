@@ -226,6 +226,71 @@ par l'API sont donc spécifiques à ce contexte.
 
 ---
 
+## Inventaire et livraison (cap PA-PROMOTE)
+
+> Provenance : cette section synthétise `docs/learning/REGLES-LIVRAISON-TM1.md`
+> (référentiel de livraison, lui-même issu de la documentation IBM). Les docs IBM
+> officielles n'ont pas pu être re-vérifiées par fetch le 2026-07-25 (réponses HTTP
+> 403/429). Conformément à la règle « ne pas deviner », rien n'est ajouté au-delà
+> du référentiel. À revalider sur le `$metadata` du serveur cible et sur la doc IBM
+> lors de l'implémentation (semaines 10-11).
+
+### Distinction de familles d'URL
+
+Trois formats d'URL coexistent selon le déploiement — ne pas les confondre :
+
+- **MCSP SaaS (lecture actuelle de PA-Explorer)** : `/api/<tenant_id>/v0/tm1/<endpoint>`
+  (voir sections plus haut). C'est le tenant de démonstration utilisé jusqu'ici.
+- **V11 (cap livraison)** : `https://host:port/api/v1/<endpoint>`.
+- **V12 (cap livraison)** : scopé par base de données —
+  `https://host:port/api/v1/Databases('tm1-i-<id>')/<endpoint>`.
+
+### Endpoints d'inventaire (modèle objet OData v4, commun V11/V12)
+
+Entités utilisées pour explorer un modèle et préparer une livraison (source :
+référentiel §1-§10) :
+
+```
+GET/POST  /Dimensions                                   (+ GET/DELETE /Dimensions('d'))
+GET       /Dimensions('d')/Hierarchies                  (+ /Hierarchies('h'))
+GET/POST  /Dimensions('d')/Hierarchies('h')/Elements
+GET/POST  /Dimensions('d')/Hierarchies('h')/Edges       (ParentName / ComponentName / Weight)
+GET       /Dimensions('d')/Hierarchies('h')/Subsets
+GET/POST  /Cubes                                        (+ GET/DELETE /Cubes('c'))
+GET       /Cubes('c')?$expand=Dimensions                (dimensionnalité d'un cube)
+GET       /Cubes('c')/Views
+GET       /Processes                                    (TurboIntegrator)
+GET       /Chores
+```
+
+Les **valeurs d'attributs** ne sont pas de la structure : elles vivent dans le cube
+de contrôle `}ElementAttributes_<dim>` et relèvent de la piste données (référentiel
+§4, §12). Les objets de contrôle (préfixe `}`) sont exclus par défaut d'une livraison.
+
+### Authentification V11 vs V12 (référentiel §14)
+
+| | V11 | V12 |
+|---|---|---|
+| Méthode | Basic (natif, mode 1) **ou CAM** : en-tête `CAMNamespace base64(user:pass:namespace)` ou `CAMPassport` (modes 2-5, **mode 5 = CAM/Cognos**), HTTPS obligatoire | **OIDC/OAuth** : bearer token, `WWW-Authenticate: openid`, client OAuth |
+| Scope d'URL | `/api/v1/...` | `/api/v1/Databases('tm1-i-<id>')/...` |
+| Accès fichier (TI) | fichiers locaux / ODBC disponibles | **supprimé** — REST only |
+
+L'accès à l'API REST complète en V11 ne dépend pas du mode de sécurité mais du bon
+en-tête d'auth ; valider la connexion sur `/api/v1/Cubes` avant toute livraison.
+
+### Pièges V12 à anticiper
+
+- **OData only** : les API REST « C / Java / .Net » et versions internes ne sont pas
+  supportées ; les utilitaires en ligne de commande V11 sont remplacés par des
+  endpoints REST.
+- **Pas d'accès fichier** : les processus TI qui lisaient des fichiers locaux / ODBC
+  doivent être reparamétrés ou signalés (référentiel P2, VN3).
+- **Scope par base** : chaque appel est relatif à `Databases('tm1-i-<id>')` ; le
+  `ServerName` a la forme `tm1-i-<id>`.
+
+Ces trois différences (auth, scope, accès fichier) sont les seules isolées derrière
+la couche `VersionProvider` (D-016) ; le reste du modèle objet est commun.
+
 ## Sources documentaires IBM
 
 | Source | URL | Quand la consulter |
@@ -235,6 +300,11 @@ par l'API sont donc spécifiques à ce contexte.
 | Troubleshooting API | `https://www.ibm.com/docs/fr/planning-analytics/3.1.0?topic=api-troubleshooting` | Diagnostiquer une erreur de connexion ou de requête |
 | Paramètres TM1 | `https://www.ibm.com/docs/fr/planning-analytics/3.1.0?topic=api-tm1-settings` | Configurer les paramètres avancés du tenant |
 | Gestion des actifs TM1 avec Git | `https://www.ibm.com/docs/fr/planning-analytics/3.1.0?topic=api-managing-tm1-database-assets-git` | Déployer des actifs TM1 entre environnements via Git |
+| Spécification tm1project | `https://www.ibm.com/docs/en/planning-analytics/2.0.0?topic=git-tm1-model-source-specification` | Ce qu'une livraison publie/exclut (structure, objets `}`) |
+| Auth & sessions V11 (CAM) | `https://www.ibm.com/docs/en/planning-analytics/2.0.0?topic=api-authenticating-managing-sessions` | En-têtes `CAMNamespace` / `CAMPassport`, mode 5 |
+| Auth REST V12 (OIDC/OAuth) | `https://www.ibm.com/docs/en/planning-analytics/3.1.0?topic=api-authenticating-rest-requests` | Bearer OAuth en V12 |
+| TM1 Database 12 (V12) | `https://www.ibm.com/docs/SSD29G_3.1.0/com.ibm.swg.ba.cognos.planning_analytics_engine.2.0.0.doc/pa_engine_getting_started.html` | Spécificités V12 (scope par base, OData only) |
+| Référentiel de livraison (repo) | `docs/learning/REGLES-LIVRAISON-TM1.md` | Règles de promotion synthétisées — source de vérité |
 
 **Consigne pour l'agent** : toujours consulter le `$metadata` du tenant avant de proposer
 un nouvel endpoint. La doc statique IBM peut diverger du comportement SaaS réel (constaté en S2).
